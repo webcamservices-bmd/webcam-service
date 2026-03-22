@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="bn" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ওয়েবক্যাম সার্ভিস</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+[data-theme="dark"]{
+  --bg:#0d0d0d;--bg2:#161616;--bg3:#1e1e1e;
+  --c1:rgba(22,22,22,.96);--c2:rgba(28,28,28,.98);--c3:#222;
+  --a1:#fff;--a2:#ccc;--a3:#777;
+  --b1:rgba(255,255,255,.1);--b2:rgba(255,255,255,.28);
+  --gl:rgba(255,255,255,.05);
+  --t1:#f0f0f0;--t2:#999;--t3:#555;
+  --ok:#4caf50;--er:#f44;--am:gold;--bl:#4499ff;
+  --sh:0 4px 30px rgba(0,0,0,.7);
+}
+[data-theme="light"]{
+  --bg:#f5f5f5;--bg2:#ebebeb;--bg3:#e0e0e0;
+  --c1:rgba(255,255,255,.97);--c2:rgba(248,248,248,.98);--c3:#fff;
+  --a1:#111;--a2:#333;--a3:#666;
+  --b1:rgba(0,0,0,.1);--b2:rgba(0,0,0,.28);
+  --gl:rgba(0,0,0,.04);
+  --t1:#111;--t2:#444;--t3:#888;
+  --ok:#2e7d32;--er:#c62828;--am:#e65100;--bl:#1565c0;
+  --sh:0 4px 30px rgba(0,0,0,.1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:'Sora',sans-serif;color:var(--t1);min-height:100vh;overflow-x:hidden;background:var(--bg);transition:background .3s,color .3s}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--a3);border-radius:2px}
+.orb{font-family:'Orbitron',sans-serif}.mono{font-family:'JetBrains Mono',monospace}
+
+/* ── NAV ── */
+#nav{position:fixed;top:0;left:0;right:0;z-index:800;height:60px;background:var(--c2);
+  backdrop-filter:blur(20px);border-bottom:1px solid var(--b1);
+  display:flex;align-items:center;justify-content:space-between;padding:0 1.2rem;gap:.6rem}
+.logo{font-family:'Orbitron',sans-serif;font-size:.9rem;font-weight:700;color:var(--a1);
+  letter-spacing:.1em;display:flex;align-items:center;gap:.4rem;cursor:pointer;text-decoration:none}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--a1);flex-shrink:0;
+  animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.nlinks{display:flex;gap:.08rem;list-style:none}
+.nlinks a{display:block;padding:.35rem .68rem;color:var(--t2);font-size:.68rem;font-weight:500;
+  border-radius:6px;cursor:pointer;transition:.2s;text-decoration:none;border:1px solid transparent}
+.nlinks a:hover,.nlinks a.on{color:var(--a1);background:var(--gl);border-color:var(--b1)}
+.nctrl{display:flex;align-items:center;gap:.35rem;flex-shrink:0}
+.seg{display:flex;border:1px solid var(--b1);border-radius:16px;overflow:hidden;background:var(--c1)}
+.seg button{background:none;border:none;padding:.26rem .58rem;font-size:.64rem;font-weight:600;
+  cursor:pointer;color:var(--t2);transition:.2s;font-family:'Sora',sans-serif;white-space:nowrap}
+.seg button.on{background:var(--a1);color:var(--bg)}
+.seg button:hover:not(.on){color:var(--a1)}
+#sBtn{width:20px;height:20px;background:none;border:none;cursor:pointer;opacity:0}
+.hbg{display:none;flex-direction:column;gap:4px;cursor:pointer;background:none;border:none;padding:4px}
+.hbg span{display:block;width:19px;height:2px;background:var(--a1);border-radius:1px}
+.mob-menu{display:none;position:fixed;top:60px;left:0;right:0;background:var(--c2);
+  backdrop-filter:blur(18px);border-bottom:1px solid var(--b1);padding:.7rem;
+  flex-direction:column;gap:.28rem;z-index:799}
+.mob-menu.open{display:flex}
+.mob-menu a{display:block;padding:.55rem .9rem;color:var(--t2);font-size:.78rem;font-weight:500;
+  border-radius:7px;cursor:pointer;transition:.2s;border:1px solid transparent}
+.mob-menu a:hover{color:var(--a1);background:var(--gl);border-color:var(--b1)}
+.mob-segs{display:flex;gap:.4rem;padding:.25rem 0;flex-wrap:wrap}
+
+/* ── SECTIONS ── */
+main{padding-top:60px}
+.sec{display:none;min-height:calc(100vh - 60px);padding:2.5rem 1.4rem;position:relative;z-index:1}
+.sec.on{display:block;animation:fadeUp .32s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.wrap{max-width:1080px;margin:0 auto}
+.stl{font-family:'Orbitron',sans-serif;font-size:clamp(1.15rem,3vw,1.75rem);
+  color:var(--a1);display:inline-block;margin-bottom:.35rem}
+.stl::after{content:'';display:block;height:2px;width:52%;margin-top:.34rem;
+  background:linear-gradient(90deg,var(--a1),transparent)}
+.ssb{color:var(--t2);font-size:.86rem;margin-bottom:1.8rem;line-height:1.65;margin-top:.45rem}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--b2),transparent);margin:1.8rem 0}
+.card{background:var(--c1);border:1px solid var(--b1);border-radius:16px;
+  box-shadow:var(--sh);position:relative;overflow:hidden;transition:.22s}
+.card:hover{border-color:var(--b2)}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:.38rem;padding:.58rem 1.3rem;
+  border-radius:8px;font-family:'Sora',sans-serif;font-size:.8rem;font-weight:600;
+  cursor:pointer;transition:.22s;border:none;text-decoration:none;letter-spacing:.02em}
+.btn-p{background:var(--a1);color:var(--bg)}.btn-p:hover{opacity:.85;transform:translateY(-1px)}
+.btn-o{background:transparent;border:1px solid var(--a2);color:var(--a1)}.btn-o:hover{background:var(--gl)}
+.btn-g{background:transparent;border:1px solid var(--b1);color:var(--t2)}.btn-g:hover{border-color:var(--a2);color:var(--a1)}
+.btn-ok{background:rgba(76,175,80,.12);border:1px solid rgba(76,175,80,.4);color:var(--ok)}.btn-ok:hover{background:var(--ok);color:#fff}
+.btn-no{background:rgba(244,67,54,.1);border:1px solid rgba(244,67,54,.35);color:var(--er)}.btn-no:hover{background:var(--er);color:#fff}
+.btn-sm{padding:.26rem .62rem;font-size:.68rem}.btn-fw{width:100%;justify-content:center}
+.btn-ld{opacity:.7;pointer-events:none}
+
+/* ── FORMS ── */
+.fg{margin-bottom:.85rem}
+.fg label{display:block;font-size:.68rem;font-weight:600;color:var(--t2);
+  margin-bottom:.3rem;letter-spacing:.05em;text-transform:uppercase}
+.fc{width:100%;background:var(--bg2);border:1px solid var(--b1);border-radius:8px;
+  padding:.62rem .9rem;color:var(--t1);font-family:'Sora',sans-serif;font-size:.84rem;
+  transition:.2s;outline:none}
+.fc::placeholder{color:var(--t3)}.fc:focus{border-color:var(--a2);box-shadow:0 0 0 2px var(--gl)}
+select.fc{cursor:pointer;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%23888' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right .8rem center}
+select.fc option{background:var(--bg2);color:var(--t1)}
+textarea.fc{resize:vertical;min-height:82px}
+.errbox{background:rgba(244,67,54,.08);border:1px solid rgba(244,67,54,.28);
+  border-radius:7px;padding:.58rem .9rem;font-size:.74rem;color:var(--er);
+  display:none;align-items:center;gap:.4rem;margin-top:.5rem}
+.errbox.on{display:flex}
+.suc{text-align:center;padding:2rem 1.4rem;display:none}.suc.on{display:block;animation:fadeUp .35s ease}
+.suc-ico{font-size:2.5rem;margin-bottom:.65rem}
+.suc-ttl{font-family:'Orbitron',sans-serif;font-size:.98rem;color:var(--a1);margin-bottom:.55rem}
+.suc-msg{color:var(--t2);font-size:.8rem;line-height:1.6}
+
+/* ── TOAST ── */
+#toasts{position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%);
+  z-index:9999;display:flex;flex-direction:column;gap:.38rem;align-items:center;pointer-events:none}
+.tst{background:var(--c2);border-radius:9px;padding:.54rem 1rem;font-size:.75rem;font-weight:500;
+  display:flex;align-items:center;gap:.42rem;border:1px solid var(--b1);box-shadow:var(--sh);
+  max-width:300px;animation:toastIn .28s cubic-bezier(.175,.885,.32,1.275)}
+.tst.ok{border-color:rgba(76,175,80,.4);color:var(--ok)}
+.tst.er{border-color:rgba(244,67,54,.38);color:var(--er)}
+.tst.nf{border-color:rgba(255,193,7,.38);color:var(--am)}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px) scale(.92)}to{opacity:1;transform:translateY(0) scale(1)}}
+.spin{width:14px;height:14px;border:2px solid var(--b1);border-top-color:var(--a1);
+  border-radius:50%;animation:spin .65s linear infinite;display:inline-block;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── HOME ── */
+#home{padding:3rem 1.4rem}#home.on{display:block}
+.hero{text-align:center;padding:2.5rem 1rem 2.2rem}
+.badge{display:inline-block;background:var(--gl);border:1px solid var(--b2);color:var(--a1);
+  font-family:'JetBrains Mono',monospace;font-size:.67rem;padding:.24rem .85rem;
+  border-radius:999px;margin-bottom:1.1rem;letter-spacing:.07em}
+.hero h1{font-family:'Orbitron',sans-serif;font-size:clamp(1.8rem,7vw,4rem);
+  font-weight:900;line-height:1.06;margin-bottom:1rem;color:var(--a1);letter-spacing:.02em}
+.hdesc{color:var(--t2);font-size:clamp(.84rem,2.2vw,1rem);max-width:500px;
+  margin:0 auto 2rem;line-height:1.78}
+.hbtns{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:.8rem;margin:1.8rem 0}
+.sbox{background:var(--c1);border:1px solid var(--b1);border-radius:12px;
+  padding:1rem;text-align:center;transition:.22s}
+.sbox:hover{border-color:var(--b2);transform:translateY(-2px)}
+.snum{font-family:'Orbitron',sans-serif;font-size:1.45rem;font-weight:900;color:var(--a1);line-height:1}
+.slbl{font-size:.63rem;color:var(--t3);margin-top:.18rem}
+
+/* ── NOTICES ── */
+.nt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:.9rem;margin-top:1.2rem}
+.nt-card{background:var(--c1);border:1px solid var(--b1);border-radius:14px;
+  padding:1.15rem;transition:.22s;position:relative;overflow:hidden}
+.nt-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--a1);opacity:0;transition:.22s}
+.nt-card:hover{border-color:var(--b2);transform:translateY(-2px)}.nt-card:hover::before{opacity:1}
+.nt-badge{display:inline-block;padding:.12rem .5rem;border-radius:999px;font-size:.6rem;
+  font-family:'JetBrains Mono',monospace;font-weight:700;letter-spacing:.05em;
+  margin-bottom:.6rem;border:1px solid var(--b1);color:var(--t2);background:var(--gl)}
+.nt-ttl{font-family:'Orbitron',sans-serif;font-size:.8rem;color:var(--a1);margin-bottom:.35rem}
+.nt-bod{font-size:.78rem;color:var(--t2);line-height:1.55}
+.nt-dt{font-size:.6rem;color:var(--t3);margin-top:.55rem;font-family:'JetBrains Mono',monospace}
+
+/* ── PACKAGES ── */
+.pkg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:.95rem;margin-top:1.6rem}
+.pkg{background:var(--c1);border:1px solid var(--b1);border-radius:16px;
+  padding:1.5rem 1.3rem;text-align:center;cursor:pointer;transition:.22s;
+  box-shadow:var(--sh);position:relative;overflow:hidden}
+.pkg:hover{border-color:var(--b2);transform:translateY(-4px)}
+.pkg.hot{border-color:var(--a2);background:var(--c2)}
+.pkg-bdg{position:absolute;top:8px;right:8px;background:var(--a1);color:var(--bg);
+  font-size:.56rem;font-family:'JetBrains Mono',monospace;font-weight:700;
+  padding:.1rem .45rem;border-radius:999px}
+.pkg-bdg.vip{background:gold;color:#111}
+.pkg-ico{font-size:1.9rem;margin-bottom:.55rem}
+.pkg-nm{font-family:'Orbitron',sans-serif;font-size:.82rem;font-weight:700;color:var(--a1);margin-bottom:.15rem}
+.pkg-dr{color:var(--t2);font-size:.73rem;margin-bottom:.75rem;font-family:'JetBrains Mono',monospace}
+.pkg-pr{font-family:'Orbitron',sans-serif;font-size:1.65rem;font-weight:900;color:var(--a1);line-height:1}
+.pkg-pr sup{font-size:.8rem;vertical-align:super;opacity:.75}
+.pkg-btn{margin-top:.9rem;display:block;width:100%;padding:.46rem;background:var(--gl);
+  border:1px solid var(--b2);color:var(--a1);border-radius:7px;font-size:.73rem;
+  font-weight:600;cursor:pointer;transition:.2s;font-family:'Sora',sans-serif}
+.pkg-btn:hover{background:var(--a1);color:var(--bg)}
+
+/* ── PRICE TABLE ── */
+.tbl-w{overflow-x:auto;border-radius:14px;border:1px solid var(--b1);box-shadow:var(--sh)}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--c2);border-bottom:1px solid var(--b2);padding:.78rem 1rem;
+  text-align:left;font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.07em;color:var(--a1)}
+tbody td{padding:.88rem 1rem;border-bottom:1px solid var(--b1);font-size:.8rem;
+  color:var(--t2);background:var(--c1);transition:.18s}
+tbody tr:last-child td{border-bottom:none}tbody tr:hover td{background:var(--c2);color:var(--t1)}
+.chip{display:inline-block;background:var(--gl);border:1px solid var(--b1);color:var(--t2);
+  padding:.11rem .55rem;border-radius:999px;font-size:.7rem;font-family:'JetBrains Mono',monospace}
+.ptag{font-family:'Orbitron',sans-serif;font-size:.92rem;font-weight:700;color:var(--a1)}
+.pay-mth{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;max-width:400px;margin-top:1.5rem}
+.pay-mc{background:var(--c1);border:1px solid var(--b1);border-radius:12px;
+  padding:.9rem;text-align:center;transition:.22s}
+.pay-mc:hover{border-color:var(--b2);transform:scale(1.02)}
+
+/* ── ORDER ── */
+.ogrid{display:grid;grid-template-columns:1fr 1.1fr;gap:1.6rem;align-items:start}
+@media(max-width:768px){.ogrid{grid-template-columns:1fr}}
+.pay-box{padding:1.5rem;position:sticky;top:70px}
+.pay-box h3{font-family:'Orbitron',sans-serif;font-size:.76rem;color:var(--a1);
+  letter-spacing:.07em;margin-bottom:1rem}
+.pi{background:var(--bg2);border:1px solid var(--b1);border-radius:12px;
+  padding:.82rem 1rem;margin-bottom:.7rem}
+.pi-lbl{font-size:.62rem;color:var(--t3);font-family:'JetBrains Mono',monospace;
+  margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.06em}
+.pi-row{display:flex;align-items:center;justify-content:space-between;gap:.55rem}
+.pi-num{font-family:'JetBrains Mono',monospace;font-size:.97rem;color:var(--t1);letter-spacing:.07em}
+.cpy{background:var(--gl);border:1px solid var(--b2);color:var(--a1);padding:.2rem .58rem;
+  border-radius:5px;font-size:.63rem;font-family:'JetBrains Mono',monospace;
+  cursor:pointer;transition:.18s;white-space:nowrap}
+.cpy:hover,.cpy.done{background:var(--a1);color:var(--bg)}
+.form-box{padding:1.5rem}
+.form-box h3{font-family:'Orbitron',sans-serif;font-size:.76rem;color:var(--a1);
+  letter-spacing:.07em;margin-bottom:1.2rem}
+
+/* ── GALLERY ── */
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.95rem;margin-top:1.2rem}
+.gal-card{background:var(--c1);border:1px solid var(--b1);border-radius:16px;
+  overflow:hidden;transition:.22s;cursor:pointer;box-shadow:var(--sh)}
+.gal-card:hover{border-color:var(--b2);transform:translateY(-3px)}
+.gal-thumb{position:relative;height:158px;overflow:hidden;background:var(--bg2)}
+.gal-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .45s ease}
+.gal-card:hover .gal-thumb img{transform:scale(1.06)}
+.lock-ov{position:absolute;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(8px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;z-index:2}
+.lock-ico{font-size:1.7rem}.lock-pr{font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:700;color:#fff}
+.lock-tx{font-size:.6rem;color:#aaa;letter-spacing:.05em}
+.gal-body{padding:.85rem 1rem}
+.gal-ttl{font-family:'Orbitron',sans-serif;font-size:.74rem;color:var(--t1);margin-bottom:.24rem}
+.gal-dsc{font-size:.72rem;color:var(--t2);line-height:1.48}
+.gal-mt{display:flex;align-items:center;justify-content:space-between;margin-top:.55rem}
+.tag-free{font-size:.59rem;font-family:'JetBrains Mono',monospace;
+  background:rgba(76,175,80,.12);border:1px solid rgba(76,175,80,.3);
+  color:var(--ok);padding:.09rem .48rem;border-radius:999px}
+.tag-lock{font-size:.59rem;font-family:'JetBrains Mono',monospace;
+  background:var(--gl);border:1px solid var(--b1);color:var(--t2);
+  padding:.09rem .48rem;border-radius:999px}
+
+/* ── REVIEWS ── */
+.rv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:.95rem;margin-bottom:2rem}
+.rv-card{background:var(--c1);border:1px solid var(--b1);border-radius:14px;padding:1.2rem;transition:.22s}
+.rv-card:hover{border-color:var(--b2);transform:translateY(-2px)}
+.rv-hdr{display:flex;align-items:center;gap:.55rem;margin-bottom:.55rem}
+.rv-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;background:var(--gl);
+  border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;
+  font-family:'Orbitron',sans-serif;font-size:.78rem;font-weight:700;color:var(--a1)}
+.rv-nm{font-weight:600;font-size:.8rem;color:var(--t1)}.rv-pk{font-size:.62rem;color:var(--t3);font-family:'JetBrains Mono',monospace}
+.rv-st{color:gold;font-size:.82rem}
+.rv-tx{font-size:.74rem;color:var(--t2);line-height:1.6;margin-top:.35rem}
+.rv-dt{font-size:.6rem;color:var(--t3);margin-top:.55rem;font-family:'JetBrains Mono',monospace}
+.star-pick{display:flex;gap:.26rem;margin-bottom:.38rem}
+.star-pick span{font-size:1.35rem;cursor:pointer;color:var(--t3);transition:color .14s}
+.star-pick span.on,.star-pick span:hover{color:gold}
+
+/* ── CONTACT ── */
+.ctgrid{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem}
+@media(max-width:640px){.ctgrid{grid-template-columns:1fr}}
+.ct-info h3{font-family:'Orbitron',sans-serif;font-size:.76rem;color:var(--a1);margin-bottom:1rem}
+.ct-item{display:flex;align-items:center;gap:.7rem;margin-bottom:.85rem;
+  padding:.75rem 1rem;background:var(--c1);border:1px solid var(--b1);border-radius:11px;transition:.22s}
+.ct-item:hover{border-color:var(--b2);transform:translateX(3px)}
+.ct-ico{font-size:1.1rem}.ct-lbl{font-size:.6rem;color:var(--t3);font-family:'JetBrains Mono',monospace;
+  text-transform:uppercase;letter-spacing:.06em}.ct-val{font-size:.8rem;color:var(--t1);margin-top:.07rem}
+.wa-big{display:flex;align-items:center;gap:.75rem;background:linear-gradient(135deg,#128c7e,#075e54);
+  border:none;border-radius:14px;padding:.9rem 1.3rem;color:#fff;font-size:.85rem;font-weight:600;
+  cursor:pointer;transition:.22s;text-decoration:none;width:100%;justify-content:center;
+  margin-bottom:1.1rem;box-shadow:0 4px 16px rgba(18,140,126,.3)}
+.wa-big:hover{background:linear-gradient(135deg,#25d366,#128c7e);transform:translateY(-2px)}
+
+/* ── FLOAT WA ── */
+.fwa{position:fixed;bottom:1.4rem;right:1.4rem;z-index:600;width:50px;height:50px;
+  border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
+  box-shadow:0 4px 16px rgba(37,211,102,.4);cursor:pointer;text-decoration:none;
+  transition:.22s;animation:fwf 3s ease-in-out infinite}
+.fwa:hover{transform:scale(1.1)!important}
+@keyframes fwf{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.fwa-tip{position:absolute;right:58px;background:rgba(18,140,126,.95);color:#fff;
+  padding:.28rem .7rem;border-radius:6px;font-size:.66rem;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity .16s}
+.fwa:hover .fwa-tip{opacity:1}
+
+/* ── MODAL ── */
+.bd{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);
+  backdrop-filter:blur(6px);z-index:1000;align-items:center;justify-content:center;padding:1rem}
+.bd.on{display:flex;animation:fadeUp .2s ease}
+.modal{background:var(--c3);border:1px solid var(--b2);border-radius:16px;padding:1.9rem;
+  width:min(92vw,410px);box-shadow:0 0 50px rgba(0,0,0,.6);position:relative;
+  animation:mpop .28s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes mpop{from{transform:scale(.9) translateY(16px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.mc{position:absolute;top:.75rem;right:.75rem;background:none;border:none;color:var(--t3);
+  font-size:1.1rem;cursor:pointer;padding:.16rem;border-radius:4px;transition:color .16s}
+.mc:hover{color:var(--er)}
+.mttl{font-family:'Orbitron',sans-serif;font-size:.85rem;color:var(--a1);letter-spacing:.07em;margin-bottom:.28rem}
+.msub{font-size:.72rem;color:var(--t3);margin-bottom:1.3rem}
+
+/* ── FOOTER ── */
+.footer{background:var(--c2);border-top:1px solid var(--b1);padding:1.4rem;
+  text-align:center;margin-top:2.5rem;position:relative;z-index:1}
+.ft-br{font-family:'Orbitron',sans-serif;font-size:.82rem;color:var(--a1);margin-bottom:.28rem}
+.ft-sb{font-size:.66rem;color:var(--t3)}
+
+/* ── ADMIN LOGIN ── */
+.al-box{width:min(92vw,398px)}
+.al-hex{width:52px;height:52px;border-radius:12px;margin:0 auto .48rem;
+  background:var(--gl);border:1px solid var(--b2);display:flex;align-items:center;
+  justify-content:center;font-size:1.45rem}
+.al-ttl{font-family:'Orbitron',sans-serif;font-size:.88rem;color:var(--a1);font-weight:700;letter-spacing:.1em}
+.al-sub{font-size:.62rem;color:var(--t3);margin-top:.12rem}
+.terminal{background:rgba(0,0,0,.4);border:1px solid var(--b1);border-radius:6px;
+  padding:.42rem .82rem;margin-bottom:1.3rem;font-family:'JetBrains Mono',monospace;
+  font-size:.62rem;display:flex;align-items:center;gap:.38rem;overflow:hidden}
+.t-dots{display:flex;gap:.24rem}.dot{width:6px;height:6px;border-radius:50%}
+.dot:nth-child(1){background:#ff5f57}.dot:nth-child(2){background:#ffbd2e}.dot:nth-child(3){background:#28c940}
+.t-txt{color:var(--t2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-cur{display:inline-block;width:5px;height:10px;background:var(--a1);
+  margin-left:2px;vertical-align:middle;animation:tcur .9s step-end infinite}
+@keyframes tcur{0%,100%{opacity:1}50%{opacity:0}}
+.iwr{position:relative}.iico{position:absolute;left:.75rem;top:50%;
+  transform:translateY(-50%);font-size:.88rem;pointer-events:none}.ifc{padding-left:2.55rem}
+.pwt{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--t3);font-size:.82rem;
+  transition:color .16s;padding:2px}.pwt:hover{color:var(--a1)}
+.al-btn{width:100%;padding:.72rem;margin-top:.28rem;background:var(--a1);border:none;
+  border-radius:9px;color:var(--bg);font-family:'Orbitron',sans-serif;font-size:.72rem;
+  font-weight:700;letter-spacing:.08em;cursor:pointer;transition:.22s;
+  display:flex;align-items:center;justify-content:center;gap:.45rem}
+.al-btn:hover{opacity:.85;transform:translateY(-1px)}.al-btn.ld{opacity:.72;pointer-events:none}
+.al-hint{text-align:center;margin-top:.82rem;font-size:.63rem;color:var(--t3)}
+.al-err{background:rgba(244,67,54,.08);border:1px solid rgba(244,67,54,.25);border-radius:7px;
+  padding:.58rem .88rem;font-size:.72rem;color:var(--er);display:none;
+  align-items:center;gap:.42rem;margin-bottom:.75rem;animation:shake .38s ease}
+.al-err.on{display:flex}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* ── ADMIN PANEL ── */
+#adm{display:none;position:fixed;inset:0;z-index:2000;background:var(--bg);flex-direction:column;overflow-y:auto}
+#adm.on{display:flex;animation:fadeUp .28s ease}
+.adm-top{position:sticky;top:0;z-index:10;height:54px;background:var(--c2);
+  backdrop-filter:blur(18px);border-bottom:1px solid var(--b1);
+  display:flex;align-items:center;justify-content:space-between;padding:0 1.3rem;gap:.65rem;flex-shrink:0}
+.adm-brand{font-family:'Orbitron',sans-serif;font-size:.82rem;color:var(--a1);
+  letter-spacing:.09em;display:flex;align-items:center;gap:.4rem}
+.adm-tag{background:var(--gl);border:1px solid var(--b2);color:var(--t2);
+  font-size:.54rem;padding:.1rem .45rem;border-radius:999px;font-family:'JetBrains Mono',monospace}
+.adm-nav{display:flex;gap:.12rem;flex-wrap:wrap}
+.adm-nav button{background:none;border:1px solid transparent;color:var(--t2);padding:.28rem .72rem;
+  border-radius:6px;font-size:.66rem;font-family:'Sora',sans-serif;font-weight:500;cursor:pointer;transition:.2s}
+.adm-nav button.on,.adm-nav button:hover{color:var(--a1);background:var(--gl);border-color:var(--b1)}
+.adm-r{display:flex;align-items:center;gap:.55rem}
+.adm-u{font-size:.68rem;color:var(--t2);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.adm-u span{color:var(--a1)}
+.lo-btn{background:none;border:1px solid rgba(244,67,54,.25);color:var(--er);
+  padding:.26rem .68rem;border-radius:6px;font-size:.66rem;cursor:pointer;transition:.2s;font-family:'Sora',sans-serif}
+.lo-btn:hover{background:var(--er);color:#fff}
+.mob-adm-btn{display:none;background:none;border:1px solid var(--b1);color:var(--a1);
+  padding:.24rem .52rem;border-radius:6px;cursor:pointer;font-size:.72rem}
+.mob-adm-menu{display:none;position:fixed;top:54px;left:0;right:0;background:var(--c2);
+  backdrop-filter:blur(16px);border-bottom:1px solid var(--b1);padding:.75rem;
+  flex-direction:column;gap:.26rem;z-index:9}
+.mob-adm-menu.open{display:flex}
+.mob-adm-menu button{background:none;border:1px solid transparent;color:var(--t2);
+  padding:.55rem .9rem;border-radius:7px;font-size:.76rem;cursor:pointer;transition:.2s;text-align:left}
+.mob-adm-menu button:hover{color:var(--a1);background:var(--gl);border-color:var(--b1)}
+.adm-body{flex:1;padding:1.7rem 1.3rem;max-width:1180px;width:100%;margin:0 auto}
+.apnl{display:none}.apnl.on{display:block;animation:fadeUp .28s ease}
+.apnl-ttl{font-family:'Orbitron',sans-serif;font-size:.92rem;color:var(--a1);
+  letter-spacing:.06em;margin-bottom:1.4rem;display:flex;align-items:center;gap:.58rem}
+.apnl-ttl::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--b2),transparent)}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:.85rem;margin-bottom:1.7rem}
+.sc{background:var(--c1);border:1px solid var(--b1);border-radius:16px;
+  padding:1.15rem;text-align:center;transition:.22s}
+.sc:hover{border-color:var(--b2);transform:translateY(-2px)}
+.sc-n{font-family:'Orbitron',sans-serif;font-size:1.72rem;font-weight:900;color:var(--a1);line-height:1}
+.sc-l{font-size:.62rem;color:var(--t3);margin-top:.24rem}
+.sc.am .sc-n{color:var(--am)}.sc.ar .sc-n{color:var(--er)}.sc.ab .sc-n{color:var(--bl)}
+.tbl-box{overflow-x:auto;border-radius:14px;border:1px solid var(--b1);box-shadow:var(--sh)}
+.tbl-box table{min-width:540px}
+.tbl-box thead th{background:var(--c2);border-bottom:1px solid var(--b2);padding:.76rem .9rem;
+  font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.07em;color:var(--a1);white-space:nowrap}
+.tbl-box tbody td{padding:.76rem .9rem;border-bottom:1px solid var(--b1);font-size:.74rem;
+  color:var(--t2);background:var(--c1);transition:.16s;vertical-align:middle}
+.tbl-box tbody tr:last-child td{border-bottom:none}
+.tbl-box tbody tr:hover td{background:var(--c2);color:var(--t1)}
+.bdg{display:inline-block;padding:.12rem .55rem;border-radius:999px;
+  font-size:.58rem;font-family:'JetBrains Mono',monospace;font-weight:600}
+.b-p{background:rgba(255,193,7,.12);border:1px solid rgba(255,193,7,.35);color:var(--am)}
+.b-a{background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.35);color:var(--ok)}
+.b-r{background:rgba(244,67,54,.1);border:1px solid rgba(244,67,54,.3);color:var(--er)}
+.b-f{background:rgba(68,153,255,.1);border:1px solid rgba(68,153,255,.3);color:var(--bl)}
+.b-m{background:rgba(255,193,7,.1);border:1px solid rgba(255,193,7,.3);color:var(--am)}
+.fltr{display:flex;gap:.52rem;margin-bottom:.95rem;flex-wrap:wrap;align-items:center}
+.fsel{background:var(--bg2);border:1px solid var(--b1);border-radius:7px;padding:.3rem .7rem;
+  color:var(--t1);font-family:'Sora',sans-serif;font-size:.72rem;outline:none;cursor:pointer;transition:.2s}
+.fsel:focus{border-color:var(--a2)}.fsel option{background:var(--bg2)}
+.fsch{background:var(--bg2);border:1px solid var(--b1);border-radius:7px;padding:.3rem .7rem;
+  color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:.7rem;outline:none;
+  transition:.2s;width:170px}
+.fsch::placeholder{color:var(--t3)}.fsch:focus{border-color:var(--a2)}
+.adm-form{background:var(--c1);border:1px solid var(--b1);border-radius:16px;padding:1.5rem}
+.adm-form h3{font-family:'Orbitron',sans-serif;font-size:.75rem;color:var(--a1);
+  letter-spacing:.07em;margin-bottom:1.2rem}
+.afc{width:100%;background:var(--bg2);border:1px solid var(--b1);border-radius:7px;
+  padding:.58rem .82rem;color:var(--t1);font-family:'Sora',sans-serif;font-size:.8rem;
+  outline:none;transition:.2s}
+.afc::placeholder{color:var(--t3)}.afc:focus{border-color:var(--a2);box-shadow:0 0 0 2px var(--gl)}
+select.afc option{background:var(--bg2)}.atx{resize:vertical;min-height:76px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.85rem}
+@media(max-width:460px){.frow{grid-template-columns:1fr}}
+.aempty{text-align:center;padding:2.2rem;color:var(--t3);font-size:.78rem}
+.aei{font-size:2rem;margin-bottom:.55rem;opacity:.38}
+
+/* ── CHATBOT ── */
+#chatBtn{position:fixed;bottom:1.4rem;left:1.4rem;z-index:600;width:50px;height:50px;
+  border-radius:50%;background:var(--a1);display:flex;align-items:center;
+  justify-content:center;font-size:1.35rem;box-shadow:var(--sh);cursor:pointer;
+  border:none;transition:.22s;animation:fwf 3s ease-in-out 1.5s infinite;color:var(--bg)}
+#chatBtn:hover{transform:scale(1.1)!important}
+.chat-pulse{position:absolute;top:-2px;right:-2px;width:12px;height:12px;border-radius:50%;
+  background:var(--er);border:2px solid var(--bg);animation:cpulse 1.8s ease-in-out infinite;
+  font-size:.5rem;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+@keyframes cpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.22)}}
+.chat-tip{position:absolute;left:58px;background:var(--c2);color:var(--a1);
+  border:1px solid var(--b1);padding:.26rem .68rem;border-radius:6px;font-size:.66rem;
+  white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .16s}
+#chatBtn:hover .chat-tip{opacity:1}
+#chatBox{position:fixed;bottom:4.8rem;left:1.4rem;z-index:700;width:min(93vw,338px);height:475px;
+  background:var(--c3);border:1px solid var(--b2);border-radius:16px;
+  box-shadow:0 0 50px rgba(0,0,0,.5);display:none;flex-direction:column;overflow:hidden}
+#chatBox.open{display:flex;animation:mpop .28s cubic-bezier(.175,.885,.32,1.275)}
+.ch-hdr{background:var(--gl);border-bottom:1px solid var(--b1);padding:.78rem .9rem;
+  display:flex;align-items:center;gap:.55rem;flex-shrink:0}
+.ch-av{width:32px;height:32px;border-radius:50%;background:var(--a1);
+  display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;color:var(--bg)}
+.ch-nm{font-family:'Orbitron',sans-serif;font-size:.72rem;color:var(--a1);letter-spacing:.04em}
+.ch-st{font-size:.6rem;color:var(--t2);display:flex;align-items:center;gap:.26rem;margin-top:.06rem}
+.ch-on{width:5px;height:5px;border-radius:50%;background:var(--ok);animation:cpulse 2s infinite}
+.ch-cl{background:none;border:none;color:var(--t3);font-size:1.05rem;cursor:pointer;
+  margin-left:auto;padding:.16rem;transition:color .16s}.ch-cl:hover{color:var(--er)}
+.ch-msgs{flex:1;overflow-y:auto;padding:.78rem;display:flex;flex-direction:column;gap:.55rem}
+.ch-msgs::-webkit-scrollbar{width:2px}.ch-msgs::-webkit-scrollbar-thumb{background:var(--b2);border-radius:1px}
+.cmsg{display:flex;gap:.42rem;align-items:flex-end;animation:fadeUp .2s ease}
+.cmsg.bot{flex-direction:row}.cmsg.usr{flex-direction:row-reverse}
+.cmav{width:22px;height:22px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:.66rem}
+.cmsg.bot .cmav{background:var(--a1);color:var(--bg)}.cmsg.usr .cmav{background:var(--gl)}
+.cmbb{max-width:82%;padding:.54rem .78rem;border-radius:10px;font-size:.76rem;line-height:1.52}
+.cmsg.bot .cmbb{background:var(--gl);border:1px solid var(--b1);color:var(--t1);border-bottom-left-radius:3px}
+.cmsg.usr .cmbb{background:var(--a1);color:var(--bg);border-bottom-right-radius:3px}
+.cmtm{font-size:.54rem;color:var(--t3);margin-top:.2rem;font-family:'JetBrains Mono',monospace}
+.typing{display:flex;gap:.26rem;padding:.45rem .68rem;background:var(--gl);border:1px solid var(--b1);
+  border-radius:9px;border-bottom-left-radius:3px;width:fit-content}
+.typing span{width:4px;height:4px;border-radius:50%;background:var(--t3);
+  animation:tdot 1.2s ease-in-out infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+.qbtns{padding:.45rem .78rem;display:flex;gap:.36rem;flex-wrap:wrap;border-top:1px solid var(--b1);flex-shrink:0}
+.qbtn{background:var(--gl);border:1px solid var(--b1);color:var(--t2);padding:.22rem .58rem;
+  border-radius:999px;font-size:.63rem;cursor:pointer;transition:.18s;white-space:nowrap}
+.qbtn:hover{background:var(--a1);color:var(--bg)}
+.ch-inp{display:flex;gap:.4rem;padding:.65rem;border-top:1px solid var(--b1);flex-shrink:0;background:var(--c2)}
+.ch-inp input{flex:1;background:var(--bg2);border:1px solid var(--b1);border-radius:16px;
+  padding:.45rem .82rem;color:var(--t1);font-family:'Sora',sans-serif;font-size:.75rem;outline:none;transition:.2s}
+.ch-inp input::placeholder{color:var(--t3)}.ch-inp input:focus{border-color:var(--a2)}
+.ch-send{width:30px;height:30px;border-radius:50%;flex-shrink:0;background:var(--a1);
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:.86rem;transition:.2s;color:var(--bg)}
+.ch-send:hover{opacity:.82;transform:scale(1.06)}
+
+@media(max-width:768px){
+  .nlinks,.adm-nav{display:none}.hbg{display:flex}.mob-adm-btn{display:block}
+  .sec,.adm-body{padding:1.8rem .9rem}.hero{padding:1.8rem 0 2rem}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:460px){
+  .pkg-grid,.pay-mth{grid-template-columns:1fr 1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="nav">
+  <a class="logo" onclick="go('home')">
+    <div class="logo-dot"></div>WEBCAM<span style="color:var(--a3)">SVC</span>
+  </a>
+  <ul class="nlinks">
+    <li><a onclick="go('home')" id="nl-home" class="on">হোম</a></li>
+    <li><a onclick="go('prices')" id="nl-prices">মূল্য</a></li>
+    <li><a onclick="go('order')" id="nl-order">অর্ডার</a></li>
+    <li><a onclick="go('gallery')" id="nl-gallery">গ্যালারি</a></li>
+    <li><a onclick="go('reviews')" id="nl-reviews">রিভিউ</a></li>
+    <li><a onclick="go('contact')" id="nl-contact">যোগাযোগ</a></li>
+  </ul>
+  <div class="nctrl">
+    <div class="seg">
+      <button id="lbn" class="on" onclick="setLang('bn')">বাং</button>
+      <button id="len" onclick="setLang('en')">EN</button>
+    </div>
+    <div class="seg">
+      <button id="tdk" class="on" onclick="setTheme('dark')">🌙</button>
+      <button id="tlt" onclick="setTheme('light')">☀️</button>
+    </div>
+    <button id="sBtn" onclick="secretHit()"></button>
+    <button class="hbg" onclick="mobToggle()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<!-- MOBILE NAV -->
+<div class="mob-menu" id="mobMenu">
+  <a onclick="go('home');mobToggle()">🏠 হোম</a>
+  <a onclick="go('prices');mobToggle()">💰 মূল্য</a>
+  <a onclick="go('order');mobToggle()">📦 অর্ডার</a>
+  <a onclick="go('gallery');mobToggle()">🖼 গ্যালারি</a>
+  <a onclick="go('reviews');mobToggle()">⭐ রিভিউ</a>
+  <a onclick="go('contact');mobToggle()">📬 যোগাযোগ</a>
+  <div class="mob-segs">
+    <div class="seg"><button id="mlbn" class="on" onclick="setLang('bn')">বাং</button><button id="mlen" onclick="setLang('en')">EN</button></div>
+    <div class="seg"><button id="mtdk" class="on" onclick="setTheme('dark')">🌙</button><button id="mtlt" onclick="setTheme('light')">☀️</button></div>
+  </div>
+</div>
+
+<main>
+
+<!-- HOME -->
+<section id="home" class="sec on">
+<div class="wrap">
+  <div class="hero">
+    <div class="badge">🟢 অনলাইন — এখনই অর্ডার নেওয়া হচ্ছে</div>
+    <h1>WEBCAM SERVICE</h1>
+    <p class="hdesc">প্রিমিয়াম প্রাইভেট ওয়েবক্যাম সেশন — দ্রুত, নিরাপদ এবং সম্পূর্ণ গোপনীয়। bKash বা Nagad-এ পেমেন্ট করুন, কয়েক মিনিটে সংযুক্ত হন।</p>
+    <div class="hbtns">
+      <button class="btn btn-p" onclick="go('order')">🎯 সার্ভিস নিন</button>
+      <button class="btn btn-o" onclick="go('prices')">📋 প্যাকেজ দেখুন</button>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="sbox"><div class="snum">৫০০+</div><div class="slbl">সন্তুষ্ট গ্রাহক</div></div>
+    <div class="sbox"><div class="snum">৪.৯★</div><div class="slbl">রেটিং</div></div>
+    <div class="sbox"><div class="snum">&lt;৫মি</div><div class="slbl">রেসপন্স</div></div>
+    <div class="sbox"><div class="snum">২৪/৭</div><div class="slbl">উপলব্ধ</div></div>
+  </div>
+  <div class="divider"></div>
+  <div class="stl">নোটিশ ও অফার</div>
+  <div class="nt-grid" id="ntGrid"></div>
+  <div class="divider"></div>
+  <div class="stl">সার্ভিস প্যাকেজ</div>
+  <p class="ssb">একবারের পেমেন্ট — কোনো লুকানো চার্জ নেই।</p>
+  <div class="pkg-grid" id="pkgGrid"></div>
+</div>
+<div class="footer">
+  <div class="ft-br">WEBCAM SERVICE</div>
+  <div class="ft-sb">নিরাপদ · গোপনীয় · দ্রুত · ২৪/৭ সাপোর্ট</div>
+</div>
+</section>
+
+<!-- PRICES -->
+<section id="prices" class="sec">
+<div class="wrap">
+  <div class="stl">মূল্য তালিকা</div>
+  <p class="ssb">সব প্যাকেজ এককালীন পেমেন্ট — কোনো সাবস্ক্রিপশন বা লুকানো চার্জ নেই।</p>
+  <div class="tbl-w">
+    <table>
+      <thead><tr><th>#</th><th>প্যাকেজ</th><th>সময়</th><th>মূল্য</th><th>অর্ডার</th></tr></thead>
+      <tbody id="prBody"></tbody>
+    </table>
+  </div>
+  <div class="divider"></div>
+  <div class="card" style="padding:1.4rem;max-width:400px">
+    <h3 class="orb" style="font-size:.74rem;color:var(--a1);letter-spacing:.07em;margin-bottom:.9rem">💳 পেমেন্ট পদ্ধতি</h3>
+    <div class="pay-mth">
+      <div class="pay-mc"><div style="font-size:1.3rem;margin-bottom:.26rem">📱</div><div style="font-weight:600;color:#e2136e;font-size:.8rem">bKash</div><div class="mono" style="font-size:.72rem;color:var(--t2);margin-top:.2rem">০১৮৯৮৬৯৪৬৪৮</div></div>
+      <div class="pay-mc"><div style="font-size:1.3rem;margin-bottom:.26rem">💸</div><div style="font-weight:600;color:#f4821f;font-size:.8rem">Nagad</div><div class="mono" style="font-size:.72rem;color:var(--t2);margin-top:.2rem">০১৮৯৮৬৯৪৬৪৮</div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ORDER -->
+<section id="order" class="sec">
+<div class="wrap">
+  <div class="stl">অর্ডার করুন</div>
+  <p class="ssb">পেমেন্ট করুন → TXN ID নিন → ফর্ম পূরণ করুন → ৫-১০ মিনিটে কনফার্মেশন।</p>
+  <div class="ogrid">
+    <div>
+      <div class="card pay-box">
+        <h3>📲 পেমেন্টের নিয়ম</h3>
+        <div style="font-size:.74rem;color:var(--t2);margin-bottom:.9rem;line-height:1.65">নিচের যেকোনো নম্বরে <strong style="color:var(--t1)">Send Money</strong> করুন। TXN ID কপি করে নিচের ফর্ম পূরণ করুন।</div>
+        <div class="pi"><div class="pi-lbl">📱 bKash — Send Money</div>
+          <div class="pi-row"><span class="pi-num">০১৮৯৮৬৯৪৬৪৮</span><button class="cpy" onclick="cpyNum(this,'01898694648')">কপি</button></div></div>
+        <div class="pi"><div class="pi-lbl">💸 Nagad — Send Money</div>
+          <div class="pi-row"><span class="pi-num">০১৮৯৮৬৯৪৬৪৮</span><button class="cpy" onclick="cpyNum(this,'01898694648')">কপি</button></div></div>
+        <div style="margin-top:.75rem;padding:.75rem .9rem;background:var(--gl);border:1px solid var(--b1);border-radius:10px;font-size:.7rem;color:var(--t2);line-height:1.58">⚠️ পেমেন্ট ভেরিফাই হওয়ার পর <strong style="color:var(--t1)">৫-১০ মিনিটে</strong> WhatsApp/IMO-তে যোগাযোগ করা হবে।</div>
+      </div>
+    </div>
+    <div>
+      <div class="card form-box">
+        <h3>📋 অর্ডার ফর্ম</h3>
+        <div class="suc" id="oSuc">
+          <div class="suc-ico">✅</div>
+          <div class="suc-ttl">অর্ডার নিশ্চিত হয়েছে!</div>
+          <div class="suc-msg">আপনার অর্ডার পেয়েছি। শীঘ্রই WhatsApp/IMO-তে যোগাযোগ করা হবে।<br><br>অর্ডার ID: <span class="mono" id="oId" style="color:var(--a1)"></span></div>
+          <button class="btn btn-o" style="margin-top:1.1rem" onclick="resetOrder()">আরেকটি অর্ডার করুন</button>
+        </div>
+        <div id="oForm">
+          <div class="fg"><label>আপনার নাম *</label><input id="oNm" class="fc" placeholder="পূর্ণ নাম লিখুন"></div>
+          <div class="fg"><label>IMO / WhatsApp নম্বর *</label><input id="oCt" class="fc" placeholder="+৮৮০..."><div style="font-size:.65rem;color:var(--t3);margin-top:.22rem">এই নম্বরে যোগাযোগ করা হবে</div></div>
+          <div class="fg"><label>ট্রানজেকশন আইডি (TXN) *</label><input id="oTx" class="fc mono" placeholder="যেমন: BK8F3XT9KP..."></div>
+          <div class="fg"><label>পেমেন্ট পদ্ধতি *</label>
+            <select id="oMt" class="fc">
+              <option value="">পদ্ধতি বেছে নিন</option>
+              <option value="bKash">bKash (বিকাশ)</option>
+              <option value="Nagad">Nagad (নগদ)</option>
+            </select>
+          </div>
+          <div class="fg"><label>আপনার ওয়ালেট নম্বর *</label><input id="oWl" class="fc mono" placeholder="যে নম্বর থেকে পাঠিয়েছেন"></div>
+          <div class="fg"><label>প্যাকেজ *</label><select id="oPk" class="fc"><option value="">প্যাকেজ বেছে নিন</option></select></div>
+          <div class="errbox" id="oErr"></div>
+          <button class="btn btn-p btn-fw" id="oBtn" onclick="submitOrder()" style="margin-top:.75rem">✅ পেমেন্ট নিশ্চিত করুন</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery" class="sec">
+<div class="wrap">
+  <div class="stl">গ্যালারি</div>
+  <p class="ssb">পোস্ট ব্রাউজ করুন। প্রিমিয়াম কন্টেন্ট আনলক করতে পেমেন্ট করুন।</p>
+  <div class="gal-grid" id="galGrid">
+    <div style="color:var(--t3);display:flex;align-items:center;gap:.5rem;padding:2rem 0"><div class="spin"></div> লোড হচ্ছে...</div>
+  </div>
+</div>
+</section>
+
+<!-- REVIEWS -->
+<section id="reviews" class="sec">
+<div class="wrap">
+  <div class="stl">রিভিউ</div>
+  <p class="ssb">আমাদের গ্রাহকদের সত্যিকারের মতামত। সার্ভিস নেওয়ার পর আপনার অভিজ্ঞতা শেয়ার করুন।</p>
+  <div class="rv-grid" id="rvGrid"></div>
+  <div class="divider"></div>
+  <div class="card" style="padding:1.5rem;max-width:530px">
+    <h3 class="orb" style="font-size:.75rem;color:var(--a1);letter-spacing:.07em;margin-bottom:1.2rem">📝 রিভিউ দিন</h3>
+    <div class="suc" id="rvSuc" style="padding:1.2rem">
+      <div class="suc-ico">⭐</div><div class="suc-ttl">রিভিউ জমা হয়েছে!</div>
+      <div class="suc-msg">ধন্যবাদ! অ্যাডমিন অ্যাপ্রুভ করলে সবাই দেখতে পাবে।</div>
+      <button class="btn btn-g" style="margin-top:.8rem" onclick="resetReview()">আরেকটি লিখুন</button>
+    </div>
+    <div id="rvForm">
+      <div class="fg"><label>আপনার নাম</label><input id="rNm" class="fc" placeholder="নাম লিখুন"></div>
+      <div class="fg"><label>কোন প্যাকেজ নিয়েছিলেন</label><select id="rPk" class="fc"><option value="">প্যাকেজ বেছে নিন</option></select></div>
+      <div class="fg"><label>রেটিং দিন</label>
+        <div class="star-pick" id="starPick">
+          <span onclick="setRating(1)">★</span><span onclick="setRating(2)">★</span>
+          <span onclick="setRating(3)">★</span><span onclick="setRating(4)">★</span><span onclick="setRating(5)">★</span>
+        </div>
+      </div>
+      <div class="fg"><label>আপনার মতামত</label><textarea id="rTx" class="fc" rows="4" placeholder="আপনার অভিজ্ঞতা শেয়ার করুন..."></textarea></div>
+      <button class="btn btn-p btn-fw" id="rBtn" onclick="submitReview()">⭐ রিভিউ জমা দিন</button>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="sec">
+<div class="wrap">
+  <div class="stl">যোগাযোগ করুন</div>
+  <p class="ssb">WhatsApp-এ মেসেজ করলে সবচেয়ে দ্রুত সাড়া পাবেন — আমরা ২৪/৭ অনলাইন।</p>
+  <div class="ctgrid">
+    <div class="ct-info">
+      <h3>যোগাযোগের তথ্য</h3>
+      <a href="https://wa.me/8801625642420" target="_blank" class="wa-big"><span style="font-size:1.3rem">💬</span> WhatsApp-এ মেসেজ করুন</a>
+      <div class="ct-item"><div class="ct-ico">💬</div><div><div class="ct-lbl">WhatsApp / IMO</div><div class="ct-val">+৮৮০ ১৬২৫ ৬৪২৪২০</div></div></div>
+      <div class="ct-item"><div class="ct-ico">💳</div><div><div class="ct-lbl">বিকাশ / নগদ</div><div class="ct-val">০১৮৯৮৬৯৪৬৪৮</div></div></div>
+      <div class="ct-item"><div class="ct-ico">🕐</div><div><div class="ct-lbl">কার্যসময়</div><div class="ct-val">২৪ ঘণ্টা / ৭ দিন</div></div></div>
+      <div class="ct-item"><div class="ct-ico">⚡</div><div><div class="ct-lbl">রেসপন্স টাইম</div><div class="ct-val">৫-১০ মিনিটের মধ্যে</div></div></div>
+    </div>
+    <div class="card" style="padding:1.5rem">
+      <h3 class="orb" style="font-size:.75rem;color:var(--a1);letter-spacing:.07em;margin-bottom:1.2rem">📨 মেসেজ পাঠান</h3>
+      <div class="suc" id="ctSuc" style="padding:1.2rem">
+        <div class="suc-ico">📬</div><div class="suc-ttl">মেসেজ পাঠানো হয়েছে!</div>
+        <div class="suc-msg">শীঘ্রই WhatsApp/IMO-তে উত্তর দেওয়া হবে।</div>
+        <button class="btn btn-g" style="margin-top:.8rem" onclick="resetContact()">আরেকটি পাঠান</button>
+      </div>
+      <div id="ctForm">
+        <div class="fg"><label>নাম</label><input id="cNm" class="fc" placeholder="আপনার নাম"></div>
+        <div class="fg"><label>WhatsApp / IMO নম্বর</label><input id="cPh" class="fc" placeholder="+৮৮০..."></div>
+        <div class="fg"><label>মেসেজ</label><textarea id="cMg" class="fc" rows="4" placeholder="কীভাবে সাহায্য করতে পারি?"></textarea></div>
+        <button class="btn btn-p btn-fw" onclick="submitContact()">📤 মেসেজ পাঠান</button>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+</main>
+
+<!-- FLOAT WA -->
+<a href="https://wa.me/8801625642420" target="_blank" class="fwa">
+  <span>💬</span><div class="fwa-tip">WhatsApp সাপোর্ট</div>
+</a>
+
+<!-- UNLOCK MODAL -->
+<div class="bd" id="ulkBd">
+  <div class="modal">
+    <button class="mc" onclick="closeBd('ulkBd')">✕</button>
+    <div class="mttl">🔓 পোস্ট আনলক করুন</div>
+    <p class="msub">০১৮৯৮৬৯৪৬৪৮ নম্বরে <strong id="ulkPr" style="color:var(--a1)"></strong> পাঠান তারপর TXN দিন।</p>
+    <div class="pi" style="margin-bottom:.82rem">
+      <div class="pi-lbl">পেমেন্ট নম্বর</div>
+      <div class="pi-row"><span class="pi-num">০১৮৯৮৬৯৪৬৪৮</span><button class="cpy" onclick="cpyNum(this,'01898694648')">কপি</button></div>
+    </div>
+    <div class="fg"><label>ট্রানজেকশন আইডি</label><input id="ulkTx" class="fc mono" placeholder="TXN ID লিখুন"></div>
+    <div class="fg"><label>আপনার ফোন নম্বর</label><input id="ulkPh" class="fc" placeholder="+880..."></div>
+    <div style="display:flex;gap:.55rem;margin-top:.78rem">
+      <button class="btn btn-g" style="flex:1" onclick="closeBd('ulkBd')">বাতিল</button>
+      <button class="btn btn-p" style="flex:2" id="ulkBtn" onclick="submitUnlock()">🔓 আনলক করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="bd" id="admBd">
+  <div class="modal al-box">
+    <button class="mc" onclick="closeBd('admBd')">✕</button>
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div class="al-hex">🛡️</div>
+      <div class="al-ttl">ADMIN PANEL</div>
+      <div class="al-sub">নিরাপদ লগইন — অননুমোদিত প্রবেশ নিষিদ্ধ</div>
+    </div>
+    <div class="terminal">
+      <div class="t-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      <span class="t-txt">root@webcam:~$ sudo authenticate --admin</span>
+      <span class="t-cur"></span>
+    </div>
+    <div class="al-err" id="aErr"><span>⛔</span><span id="aErrTxt">ভুল তথ্য</span></div>
+    <div class="fg"><label>ইউজারনেম</label>
+      <div class="iwr"><span class="iico">👤</span><input id="aUs" class="fc ifc" type="text" placeholder="admin" autocomplete="username"></div>
+    </div>
+    <div class="fg"><label>পাসওয়ার্ড</label>
+      <div class="iwr"><span class="iico">🔑</span><input id="aPs" class="fc ifc" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"><button class="pwt" onclick="togglePw()" type="button">👁</button></div>
+    </div>
+    <button class="al-btn" id="alBtn" onclick="doLogin()"><span id="alBtnTxt">⌨ অ্যাডমিন প্যানেলে প্রবেশ করুন</span></button>
+    <div class="al-hint">Default: admin / </div>
+  </div>
+</div>
+
+<!-- CHATBOT -->
+<button id="chatBtn" onclick="toggleChat()">
+  🤖<div class="chat-pulse">১</div><div class="chat-tip">AI সহকারী</div>
+</button>
+<div id="chatBox">
+  <div class="ch-hdr">
+    <div class="ch-av">🤖</div>
+    <div style="flex:1">
+      <div class="ch-nm">Webcam AI</div>
+      <div class="ch-st"><div class="ch-on"></div><span>সবসময় অনলাইন</span></div>
+    </div>
+    <button class="ch-cl" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="ch-msgs" id="chatMsgs"></div>
+  <div class="qbtns" id="qbtns">
+    <button class="qbtn" onclick="quickMsg('দাম কত?')">💰 দাম</button>
+    <button class="qbtn" onclick="quickMsg('কীভাবে অর্ডার করব?')">📦 অর্ডার</button>
+    <button class="qbtn" onclick="quickMsg('পেমেন্ট নম্বর কত?')">💳 পেমেন্ট</button>
+    <button class="qbtn" onclick="quickMsg('কতক্ষণ পর কনফার্ম হবে?')">⏰ সময়</button>
+  </div>
+  <div class="ch-inp">
+    <input id="chatIn" placeholder="প্রশ্ন করুন..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="ch-send" onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adm">
+  <div class="adm-top">
+    <div class="adm-brand"><div class="logo-dot"></div>WEBCAM<span style="color:var(--a3)">SVC</span><span class="adm-tag">ADMIN</span></div>
+    <div class="adm-nav">
+      <button class="on" onclick="admGo('dash',this)">📊 Dashboard</button>
+      <button onclick="admGo('notices',this)">📢 নোটিশ</button>
+      <button onclick="admGo('services',this)">💰 সার্ভিস</button>
+      <button onclick="admGo('orders',this)">📦 অর্ডার</button>
+      <button onclick="admGo('reviews',this)">⭐ রিভিউ</button>
+      <button onclick="admGo('posts',this)">🖼 গ্যালারি</button>
+      <button onclick="admGo('access',this)">🔓 অ্যাক্সেস</button>
+    </div>
+    <div class="adm-r">
+      <div class="adm-u">Admin: <span id="admUsr">admin</span></div>
+      <button class="mob-adm-btn" onclick="mAdmToggle()">☰</button>
+      <button class="lo-btn" onclick="doLogout()">🚪 Logout</button>
+    </div>
+  </div>
+  <div class="mob-adm-menu" id="mobAdmMenu">
+    <button onclick="admGo('dash',null);closeMobAdm()">📊 Dashboard</button>
+    <button onclick="admGo('notices',null);closeMobAdm()">📢 নোটিশ/পোস্ট</button>
+    <button onclick="admGo('services',null);closeMobAdm()">💰 সার্ভিস ও মূল্য</button>
+    <button onclick="admGo('orders',null);closeMobAdm()">📦 অর্ডার</button>
+    <button onclick="admGo('reviews',null);closeMobAdm()">⭐ রিভিউ</button>
+    <button onclick="admGo('posts',null);closeMobAdm()">🖼 গ্যালারি পোস্ট</button>
+    <button onclick="admGo('access',null);closeMobAdm()">🔓 অ্যাক্সেস</button>
+  </div>
+  <div class="adm-body">
+
+    <!-- DASHBOARD -->
+    <div class="apnl on" id="ap-dash">
+      <div class="apnl-ttl">📊 Dashboard</div>
+      <div class="stat-grid">
+        <div class="sc"><div class="sc-n" id="dTot">0</div><div class="sc-l">মোট অর্ডার</div></div>
+        <div class="sc am"><div class="sc-n" id="dPnd">0</div><div class="sc-l">অপেক্ষমাণ</div></div>
+        <div class="sc"><div class="sc-n" id="dApr">0</div><div class="sc-l">অ্যাপ্রুভড</div></div>
+        <div class="sc ar"><div class="sc-n" id="dRjt">0</div><div class="sc-l">বাতিল</div></div>
+        <div class="sc ab"><div class="sc-n" id="dRev">৳0</div><div class="sc-l">মোট আয়</div></div>
+        <div class="sc am"><div class="sc-n" id="dRvp">0</div><div class="sc-l">রিভিউ পেন্ডিং</div></div>
+      </div>
+      <div class="apnl-ttl" style="font-size:.76rem;margin-bottom:.88rem">🕐 সাম্প্রতিক অর্ডার</div>
+      <div class="tbl-box"><table><thead><tr><th>নাম</th><th>প্যাকেজ</th><th>পরিমাণ</th><th>স্ট্যাটাস</th><th>তারিখ</th></tr></thead><tbody id="dRec"></tbody></table></div>
+    </div>
+
+    <!-- NOTICES -->
+    <div class="apnl" id="ap-notices">
+      <div class="apnl-ttl">📢 হোমপেজ নোটিশ ও পোস্ট</div>
+      <div style="display:grid;grid-template-columns:minmax(255px,340px) 1fr;gap:1.5rem;align-items:start">
+        <div class="adm-form">
+          <h3>➕ নতুন পোস্ট যোগ করুন</h3>
+          <div class="fg"><label>শিরোনাম *</label><input id="ntTl" class="afc" placeholder="পোস্টের শিরোনাম"></div>
+          <div class="fg"><label>বিষয়বস্তু *</label><textarea id="ntBd" class="afc atx" rows="3" placeholder="বিস্তারিত লিখুন..."></textarea></div>
+          <div class="fg"><label>ধরন</label>
+            <select id="ntTp" class="afc">
+              <option value="offer">🎁 অফার</option>
+              <option value="notice">📢 নোটিশ</option>
+              <option value="news">📰 নিউজ</option>
+              <option value="update">🔔 আপডেট</option>
+            </select>
+          </div>
+          <div class="errbox" id="ntErr" style="margin-bottom:.65rem"></div>
+          <button class="btn btn-p btn-fw" onclick="addNotice()">➕ পোস্ট প্রকাশ করুন</button>
+        </div>
+        <div>
+          <div class="fltr"><button class="btn btn-sm btn-g" onclick="renderNoticesAdm()">🔄 রিফ্রেশ</button><span class="mono" style="font-size:.65rem;color:var(--t3)" id="ntCnt"></span></div>
+          <div class="tbl-box"><table><thead><tr><th>শিরোনাম</th><th>ধরন</th><th>তারিখ</th><th>Action</th></tr></thead><tbody id="ntAdmBody"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICES -->
+    <div class="apnl" id="ap-services">
+      <div class="apnl-ttl">💰 সার্ভিস ও মূল্য ব্যবস্থাপনা</div>
+      <div style="display:grid;grid-template-columns:minmax(255px,340px) 1fr;gap:1.5rem;align-items:start">
+        <div class="adm-form">
+          <h3>➕ নতুন সার্ভিস যোগ করুন</h3>
+          <div class="fg"><label>প্যাকেজের নাম *</label><input id="svNm" class="afc" placeholder="যেমন: স্ট্যান্ডার্ড"></div>
+          <div class="fg"><label>সময়কাল (মিনিট) *</label><input id="svDr" class="afc" type="number" placeholder="10" min="1"></div>
+          <div class="fg"><label>মূল্য (৳) *</label><input id="svPr" class="afc" type="number" placeholder="200" min="1"></div>
+          <div class="fg"><label>আইকন (ইমোজি)</label><input id="svIc" class="afc" placeholder="🎯" maxlength="4"></div>
+          <div class="fg"><label><input type="checkbox" id="svHt" style="margin-right:.38rem"> জনপ্রিয় হিসেবে দেখান</label></div>
+          <div class="fg"><label><input type="checkbox" id="svVp" style="margin-right:.38rem"> VIP ব্যাজ দেখান</label></div>
+          <div class="errbox" id="svErr" style="margin-bottom:.65rem"></div>
+          <button class="btn btn-p btn-fw" onclick="addService()">➕ সার্ভিস যোগ করুন</button>
+        </div>
+        <div>
+          <div class="fltr"><button class="btn btn-sm btn-g" onclick="renderServicesAdm()">🔄 রিফ্রেশ</button><span class="mono" style="font-size:.65rem;color:var(--t3)" id="svCnt"></span></div>
+          <div class="tbl-box"><table><thead><tr><th>প্যাকেজ</th><th>সময়</th><th>মূল্য</th><th>ব্যাজ</th><th>Action</th></tr></thead><tbody id="svBody"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="apnl" id="ap-orders">
+      <div class="apnl-ttl">📦 অর্ডার ম্যানেজমেন্ট</div>
+      <div class="fltr">
+        <select class="fsel" id="oFltr" onchange="renderOrders()"><option value="">সব স্ট্যাটাস</option><option value="pending">অপেক্ষমাণ</option><option value="approved">অ্যাপ্রুভড</option><option value="rejected">বাতিল</option></select>
+        <input class="fsch" id="oSrch" placeholder="🔍 নাম বা TXN..." oninput="renderOrders()">
+        <button class="btn btn-sm btn-g" onclick="renderOrders()">🔄</button>
+      </div>
+      <div class="tbl-box"><table><thead><tr><th>নাম</th><th>IMO/WA</th><th>প্যাকেজ</th><th>TXN ID</th><th>পদ্ধতি</th><th>পরিমাণ</th><th>স্ট্যাটাস</th><th>Action</th></tr></thead><tbody id="oBody"></tbody></table></div>
+    </div>
+
+    <!-- REVIEWS ADMIN -->
+    <div class="apnl" id="ap-reviews">
+      <div class="apnl-ttl">⭐ রিভিউ ম্যানেজমেন্ট</div>
+      <div class="fltr">
+        <select class="fsel" id="rvFltr" onchange="renderReviewsAdm()"><option value="">সব</option><option value="pending">অপেক্ষমাণ</option><option value="approved">অ্যাপ্রুভড</option><option value="rejected">বাতিল</option></select>
+        <button class="btn btn-sm btn-g" onclick="renderReviewsAdm()">🔄</button>
+      </div>
+      <div class="tbl-box"><table><thead><tr><th>নাম</th><th>প্যাকেজ</th><th>রেটিং</th><th>মতামত</th><th>স্ট্যাটাস</th><th>Action</th></tr></thead><tbody id="rvAdmBody"></tbody></table></div>
+    </div>
+
+    <!-- GALLERY ADMIN -->
+    <div class="apnl" id="ap-posts">
+      <div class="apnl-ttl">🖼 গ্যালারি পোস্ট ম্যানেজমেন্ট</div>
+      <div style="display:grid;grid-template-columns:minmax(255px,340px) 1fr;gap:1.5rem;align-items:start">
+        <div class="adm-form">
+          <h3>➕ নতুন গ্যালারি পোস্ট</h3>
+          <div class="fg"><label>শিরোনাম *</label><input id="pTl" class="afc" placeholder="পোস্ট শিরোনাম"></div>
+          <div class="fg"><label>বিবরণ</label><textarea id="pDs" class="afc atx" rows="2" placeholder="সংক্ষিপ্ত বিবরণ..."></textarea></div>
+          <div class="fg"><label>থাম্বনেইল URL</label><input id="pTh" class="afc" placeholder="https://...ছবির লিংক"></div>
+          <div class="fg"><label>মিডিয়া URL</label><input id="pMd" class="afc" placeholder="https://...ভিডিও লিংক"></div>
+          <div class="frow" style="margin-bottom:.85rem">
+            <div>
+              <label style="display:block;font-size:.68rem;font-weight:600;color:var(--t2);margin-bottom:.28rem;text-transform:uppercase;letter-spacing:.05em">ধরন</label>
+              <select id="pTp" class="afc" onchange="togglePrc()"><option value="free">🆓 ফ্রি</option><option value="premium">🔒 প্রিমিয়াম</option></select>
+            </div>
+            <div id="prcWrap">
+              <label style="display:block;font-size:.68rem;font-weight:600;color:var(--t2);margin-bottom:.28rem;text-transform:uppercase;letter-spacing:.05em">মূল্য ৳</label>
+              <select id="pPrc" class="afc"><option value="50">৳৫০</option><option value="100">৳১০০</option></select>
+            </div>
+          </div>
+          <div class="errbox" id="pErr" style="margin-bottom:.65rem"></div>
+          <button class="btn btn-p btn-fw" onclick="addPost()">➕ পোস্ট যোগ করুন</button>
+        </div>
+        <div>
+          <div class="fltr"><button class="btn btn-sm btn-g" onclick="renderPostsAdm()">🔄 রিফ্রেশ</button><span class="mono" style="font-size:.65rem;color:var(--t3)" id="pCnt"></span></div>
+          <div class="tbl-box"><table><thead><tr><th>শিরোনাম</th><th>ধরন</th><th>মূল্য</th><th>সক্রিয়</th><th>Action</th></tr></thead><tbody id="pAdmBody"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCESS -->
+    <div class="apnl" id="ap-access">
+      <div class="apnl-ttl">🔓 গ্যালারি অ্যাক্সেস রিকোয়েস্ট</div>
+      <div class="fltr">
+        <select class="fsel" id="acFltr" onchange="renderAccess()"><option value="">সব</option><option value="pending">অপেক্ষমাণ</option><option value="approved">অ্যাপ্রুভড</option><option value="rejected">বাতিল</option></select>
+        <button class="btn btn-sm btn-g" onclick="renderAccess()">🔄</button>
+      </div>
+      <div class="tbl-box"><table><thead><tr><th>ফোন</th><th>পোস্ট</th><th>TXN ID</th><th>পেইড</th><th>স্ট্যাটাস</th><th>Action</th></tr></thead><tbody id="acBody"></tbody></table></div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+/* ════════════════════════════════
+   CONFIG
+════════════════════════════════ */
+const ADMIN = {u:'admin', p:'badhon2006'};
+const API   = '';
+const WA    = '8801625642420';
+const EJK   = '-GNKv_2SncdX_SBXI';
+const EJS   = 'service_nif8exi';
+const EJT   = 'template_w0xeo63';
+const EJM   = 'webcamservicesbmd@gmail.com';
+
+(function(){
+  if(typeof emailjs!=='undefined') emailjs.init({publicKey:EJK});
+})();
+
+/* ════════════════════════════════
+   DATA
+════════════════════════════════ */
+const DB = {
+  services:[
+    {id:'s1',bn:'ট্রায়াল',en:'Trial',dur:2,price:50,icon:'⚡',hot:false,vip:false,on:true},
+    {id:'s2',bn:'স্ট্যান্ডার্ড',en:'Standard',dur:10,price:200,icon:'🎯',hot:true,vip:false,on:true},
+    {id:'s3',bn:'এক্সটেন্ডেড',en:'Extended',dur:20,price:400,icon:'🔥',hot:false,vip:false,on:true},
+    {id:'s4',bn:'প্রিমিয়াম',en:'Premium',dur:30,price:500,icon:'👑',hot:false,vip:true,on:true},
+  ],
+  notices:[
+    {id:'n1',tl:'🎉 স্বাগত বিশেষ অফার!',bd:'নতুন গ্রাহকদের জন্য ট্রায়াল প্যাকেজে বিশেষ সুবিধা। আজই অর্ডার করুন!',tp:'offer',dt:new Date().toISOString()},
+    {id:'n2',tl:'📢 গুরুত্বপূর্ণ নোটিশ',bd:'সার্ভিস সকাল ৮টা থেকে রাত ১২টা পর্যন্ত উপলব্ধ। যোগাযোগ: +880'+WA,tp:'notice',dt:new Date().toISOString()},
+  ],
+  orders:[
+    {_id:'o1',name:'রহিম আহমেদ',imo:'+8801711111111',pkg:'স্ট্যান্ডার্ড – ১০মি – ৳২০০',txn:'BK8F3XT9KP',method:'bKash',wallet:'01711111111',amount:200,status:'pending',dt:'2025-03-15T10:00:00Z'},
+    {_id:'o2',name:'করিম হোসেন',imo:'+8801722222222',pkg:'প্রিমিয়াম – ৩০মি – ৳৫০০',txn:'NG4J7YZ2QA',method:'Nagad',wallet:'01722222222',amount:500,status:'approved',dt:'2025-03-14T14:30:00Z'},
+    {_id:'o3',name:'সুমন মিয়া',imo:'+8801733333333',pkg:'ট্রায়াল – ২মি – ৳৫০',txn:'BK1R9WV5MN',method:'bKash',wallet:'01733333333',amount:50,status:'pending',dt:'2025-03-13T09:15:00Z'},
+  ],
+  reviews:[
+    {_id:'r1',name:'রহিম',pkg:'স্ট্যান্ডার্ড',stars:5,txt:'অনেক দ্রুত সাড়া পেয়েছি! সার্ভিস খুব ভালো।',status:'approved',dt:'2025-03-10'},
+    {_id:'r2',name:'করিম',pkg:'প্রিমিয়াম',stars:5,txt:'সেরা সার্ভিস, প্রতিটা টাকা উসুল।',status:'approved',dt:'2025-03-09'},
+    {_id:'r3',name:'সুমন',pkg:'ট্রায়াল',stars:4,txt:'ট্রায়ালের জন্য বেশ ভালো অভিজ্ঞতা।',status:'pending',dt:'2025-03-08'},
+    {_id:'r4',name:'জামাল',pkg:'এক্সটেন্ডেড',stars:5,txt:'দারুণ! পেশাদার এবং গোপনীয়।',status:'approved',dt:'2025-03-07'},
+  ],
+  posts:[
+    {_id:'p1',title:'প্রিভিউ সেশন #০১',desc:'ফ্রি টিজার ক্লিপ।',thumb:'https://picsum.photos/seed/w1/400/280',premium:false,price:0,active:true},
+    {_id:'p2',title:'এক্সক্লুসিভ সেশন #০৭',desc:'১০ মিনিটের পূর্ণ রেকর্ডিং।',thumb:'https://picsum.photos/seed/w2/400/280',premium:true,price:50,active:true},
+    {_id:'p3',title:'ভিআইপি সেশন #১২',desc:'২০ মিনিটের ভিআইপি কন্টেন্ট।',thumb:'https://picsum.photos/seed/w3/400/280',premium:true,price:100,active:true},
+    {_id:'p4',title:'হাইলাইট ক্লিপ #০৩',desc:'বিনামূল্যে দেখুন।',thumb:'https://picsum.photos/seed/w4/400/280',premium:false,price:0,active:true},
+  ],
+  access:[],
+};
+
+/* ════════════════════════════════
+   STATE
+════════════════════════════════ */
+let lang=localStorage.getItem('wcs_lang')||'bn';
+let theme=localStorage.getItem('wcs_theme')||'dark';
+let token=null,admUser=null,demoMode=false;
+let userRating=0,ulkPostId=null,ulkPrice=null,secretHits=0;
+let chatOpen=false,chatStarted=false,chatHist=[];
+
+/* ════════════════════════════════
+   HELPERS
+════════════════════════════════ */
+function toast(msg,type='ok',ms=3000){
+  const c=document.getElementById('toasts');
+  const t=document.createElement('div');
+  t.className='tst '+type;
+  t.innerHTML='<span>'+{ok:'✅',er:'❌',nf:'ℹ️'}[type]+'</span>'+msg;
+  c.appendChild(t);
+  setTimeout(()=>{t.style.transition='opacity .3s,transform .3s';t.style.opacity='0';t.style.transform='translateY(8px)';setTimeout(()=>t.remove(),320);},ms);
+}
+async function api(path,opts={}){
+  const h={'Content-Type':'application/json'};
+  if(token) h['Authorization']='Bearer '+token;
+  try{const r=await fetch(API+path,{...opts,headers:h});const d=await r.json().catch(()=>({}));return{ok:r.ok,data:d};}
+  catch{return{ok:false,data:{}};}
+}
+function sld(btn,on){
+  if(on){btn._h=btn.innerHTML;btn.innerHTML='<div class="spin"></div>';btn.disabled=true;}
+  else{btn.innerHTML=btn._h||btn.innerHTML;btn.disabled=false;}
+}
+function openBd(id){document.getElementById(id)?.classList.add('on');document.body.style.overflow='hidden';}
+function closeBd(id){document.getElementById(id)?.classList.remove('on');document.body.style.overflow='';}
+document.querySelectorAll('.bd').forEach(b=>b.addEventListener('click',e=>{if(e.target===b)closeBd(b.id);}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.bd.on').forEach(b=>closeBd(b.id));});
+
+/* ════════════════════════════════
+   THEME & LANG
+════════════════════════════════ */
+function setTheme(t){
+  theme=t;localStorage.setItem('wcs_theme',t);
+  document.documentElement.setAttribute('data-theme',t);
+  ['tdk','mtdk'].forEach(id=>document.getElementById(id)?.classList.toggle('on',t==='dark'));
+  ['tlt','mtlt'].forEach(id=>document.getElementById(id)?.classList.toggle('on',t==='light'));
+}
+function setLang(l){
+  lang=l;localStorage.setItem('wcs_lang',l);
+  ['lbn','mlbn'].forEach(id=>document.getElementById(id)?.classList.toggle('on',l==='bn'));
+  ['len','mlen'].forEach(id=>document.getElementById(id)?.classList.toggle('on',l==='en'));
+  const bn=['হোম','মূল্য','অর্ডার','গ্যালারি','রিভিউ','যোগাযোগ'];
+  const en=['Home','Prices','Order','Gallery','Reviews','Contact'];
+  ['home','prices','order','gallery','reviews','contact'].forEach((id,i)=>{
+    const el=document.getElementById('nl-'+id);if(el) el.textContent=l==='bn'?bn[i]:en[i];
+  });
+  renderPkgs();renderPrTbl();renderPkgOpts();renderNotices();
+  toast(l==='bn'?'বাংলায় পরিবর্তিত':'Switched to English','nf',1800);
+}
+
+/* ════════════════════════════════
+   NAVIGATION
+════════════════════════════════ */
+function go(id){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.nlinks a').forEach(a=>a.classList.remove('on'));
+  document.getElementById(id)?.classList.add('on');
+  document.getElementById('nl-'+id)?.classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='gallery') renderGallery();
+  if(id==='reviews') renderReviews();
+}
+function mobToggle(){document.getElementById('mobMenu').classList.toggle('open');}
+function secretHit(){secretHits++;if(secretHits>=5){secretHits=0;openBd('admBd');setTimeout(()=>document.getElementById('aUs')?.focus(),250);}}
+
+/* ════════════════════════════════
+   COPY
+════════════════════════════════ */
+function cpyNum(btn,num){
+  navigator.clipboard?.writeText(num).catch(()=>{const t=document.createElement('textarea');t.value=num;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();});
+  const orig=btn.textContent;
+  btn.textContent='✓ কপি';btn.classList.add('done');
+  toast('নম্বর কপি হয়েছে!');
+  setTimeout(()=>{btn.textContent=orig;btn.classList.remove('done');},2500);
+}
+
+/* ════════════════════════════════
+   SERVICES
+════════════════════════════════ */
+function activeSvs(){return DB.services.filter(s=>s.on);}
+
+function renderPkgs(){
+  const svs=activeSvs(),isBn=lang==='bn';
+  document.getElementById('pkgGrid').innerHTML=svs.map(s=>{
+    const nm=isBn?s.bn:s.en;
+    const dur=s.dur+(isBn?' মিনিট':' min');
+    return `<div class="pkg ${s.hot?'hot':''}" onclick="selPkg('${nm}','${s.price}')">
+      ${s.hot?`<div class="pkg-bdg">${isBn?'জনপ্রিয়':'Popular'}</div>`:''}
+      ${s.vip?`<div class="pkg-bdg vip">VIP</div>`:''}
+      <div class="pkg-ico">${s.icon||'🎯'}</div>
+      <div class="pkg-nm">${nm.toUpperCase()}</div>
+      <div class="pkg-dr">${dur}</div>
+      <div class="pkg-pr"><sup>৳</sup>${s.price}</div>
+      <button class="pkg-btn">${isBn?'অর্ডার করুন':'Order Now'}</button>
+    </div>`;
+  }).join('');
+}
+
+function renderPrTbl(){
+  const svs=activeSvs(),isBn=lang==='bn';
+  document.getElementById('prBody').innerHTML=svs.map((s,i)=>{
+    const nm=isBn?s.bn:s.en;
+    const dur=s.dur+(isBn?' মিনিট':' min');
+    return `<tr>
+      <td class="mono" style="color:var(--t3)">${String(i+1).padStart(2,'0')}</td>
+      <td><strong style="color:var(--t1)">${nm}</strong>
+        ${s.hot?`<div style="font-size:.65rem;color:var(--ok);margin-top:2px">⭐ ${isBn?'সবচেয়ে জনপ্রিয়':'Most Popular'}</div>`:''}
+        ${s.vip?`<div style="font-size:.65rem;color:gold;margin-top:2px">👑 VIP</div>`:''}
+      </td>
+      <td><span class="chip">${dur}</span></td>
+      <td><span class="ptag">৳${s.price}</span></td>
+      <td><button class="btn btn-sm btn-o" onclick="selPkg('${nm}','${s.price}')">${isBn?'অর্ডার':'Order'}</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPkgOpts(){
+  const svs=activeSvs(),isBn=lang==='bn';
+  const def=isBn?'প্যাকেজ বেছে নিন':'Select package';
+  const opts=svs.map(s=>{
+    const nm=isBn?s.bn:s.en;
+    const val=`${nm} – ${s.dur}${isBn?'মি':'min'} – ৳${s.price}`;
+    return `<option value="${val}">${nm} – ${s.dur} ${isBn?'মিনিট':'min'} – ৳${s.price}</option>`;
+  }).join('');
+  document.getElementById('oPk').innerHTML=`<option value="">${def}</option>`+opts;
+  document.getElementById('rPk').innerHTML=`<option value="">${def}</option>`+svs.map(s=>`<option>${isBn?s.bn:s.en}</option>`).join('');
+}
+
+function selPkg(name,price){
+  go('order');
+  const sel=document.getElementById('oPk');
+  for(let i=0;i<sel.options.length;i++){if(sel.options[i].value.includes(name)){sel.selectedIndex=i;break;}}
+  toast((lang==='bn'?'প্যাকেজ: ':'Package: ')+name,'nf');
+}
+
+/* ════════════════════════════════
+   NOTICES
+════════════════════════════════ */
+const NT_LBL={offer:'🎁 অফার',notice:'📢 নোটিশ',news:'📰 নিউজ',update:'🔔 আপডেট'};
+
+function renderNotices(){
+  const el=document.getElementById('ntGrid');
+  if(!DB.notices.length){el.innerHTML='<div style="color:var(--t3);font-size:.8rem">কোনো পোস্ট নেই।</div>';return;}
+  el.innerHTML=DB.notices.map(n=>`
+    <div class="nt-card">
+      <span class="nt-badge">${NT_LBL[n.tp]||n.tp}</span>
+      <div class="nt-ttl">${n.tl}</div>
+      <div class="nt-bod">${n.bd}</div>
+      <div class="nt-dt">${new Date(n.dt).toLocaleDateString('en-GB')}</div>
+    </div>`).join('');
+}
+
+/* ════════════════════════════════
+   EMAIL NOTIFICATION
+════════════════════════════════ */
+async function sendEmail(o){
+  if(typeof emailjs==='undefined') return;
+  emailjs.init({publicKey:EJK});
+  const time=new Date().toLocaleString('en-BD',{timeZone:'Asia/Dhaka'});
+  const msg=`🔔 নতুন অর্ডার!\n\nনাম: ${o.name}\nপ্যাকেজ: ${o.pkg}\nপেমেন্ট: ${o.method}\nTXN: ${o.txn}\nIMO/WA: ${o.contact}\nWallet: ${o.wallet}\nসময়: ${time}`;
+  try{
+    await emailjs.send(EJS,EJT,{
+      to_email:EJM, subject:'🔔 নতুন অর্ডার — '+o.name+' — '+o.pkg,
+      order_name:o.name, order_pkg:o.pkg, order_method:o.method,
+      order_txn:o.txn, order_contact:o.contact, order_wallet:o.wallet,
+      order_time:time, message:msg,
+    });
+    toast('📧 Gmail notification পাঠানো হয়েছে!','ok',2500);
+  }catch(e){console.error('Email err:',e);}
+}
+
+/* ════════════════════════════════
+   ORDER SUBMIT
+════════════════════════════════ */
+async function submitOrder(){
+  const nm=document.getElementById('oNm').value.trim();
+  const ct=document.getElementById('oCt').value.trim();
+  const tx=document.getElementById('oTx').value.trim();
+  const mt=document.getElementById('oMt').value;
+  const wl=document.getElementById('oWl').value.trim();
+  const pk=document.getElementById('oPk').value;
+  const eb=document.getElementById('oErr');
+  eb.classList.remove('on');
+  if(!nm||!ct||!tx||!mt||!wl||!pk){eb.innerHTML='⚠️ সব তথ্য পূরণ করুন।';eb.classList.add('on');return;}
+  if(tx.length<5){eb.innerHTML='⚠️ TXN আইডি সঠিক নয়।';eb.classList.add('on');return;}
+  const btn=document.getElementById('oBtn');
+  sld(btn,true);
+  const res=await api('/api/order',{method:'POST',body:JSON.stringify({name:nm,contact:ct,txn:tx,method:mt,wallet:wl,package:pk})});
+  sld(btn,false);
+  const oid=res.data?.orderId||res.data?.data?.order_ref||'WCS-'+Math.random().toString(36).substr(2,8).toUpperCase();
+  document.getElementById('oId').textContent=oid;
+  document.getElementById('oForm').style.display='none';
+  document.getElementById('oSuc').classList.add('on');
+  toast('✅ অর্ডার নিশ্চিত হয়েছে! 🎉');
+  sendEmail({name:nm,pkg:pk,method:mt,txn:tx,contact:ct,wallet:wl});
+  DB.orders.unshift({_id:'n'+Date.now(),name:nm,imo:ct,pkg:pk,txn:tx,method:mt,wallet:wl,
+    amount:parseInt((pk.match(/৳(\d+)/)||[0,0])[1])||0,status:'pending',dt:new Date().toISOString()});
+}
+
+function resetOrder(){
+  document.getElementById('oForm').style.display='';
+  document.getElementById('oSuc').classList.remove('on');
+  ['oNm','oCt','oTx','oWl'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('oMt').selectedIndex=0;
+  document.getElementById('oPk').selectedIndex=0;
+  document.getElementById('oErr').classList.remove('on');
+}
+
+/* ════════════════════════════════
+   GALLERY
+════════════════════════════════ */
+async function renderGallery(){
+  const res=await api('/api/posts');
+  const posts=res.ok&&Array.isArray(res.data?.data)?res.data.data:DB.posts.filter(p=>p.active);
+  const isBn=lang==='bn';
+  document.getElementById('galGrid').innerHTML=posts.map(p=>`
+    <div class="gal-card" onclick="${p.premium||p.is_premium?`openUnlock('${p._id}','${p.price}')`:''}" >
+      <div class="gal-thumb">
+        <img src="${p.thumb||p.thumbnail_url}" alt="${p.title}" loading="lazy" onerror="this.style.display='none'">
+        ${p.premium||p.is_premium?`<div class="lock-ov"><div class="lock-ico">🔒</div><div class="lock-pr">৳${p.price}</div><div class="lock-tx">${isBn?'ক্লিক করে আনলক করুন':'Click to unlock'}</div></div>`:''}
+      </div>
+      <div class="gal-body">
+        <div class="gal-ttl">${p.title}</div>
+        <div class="gal-dsc">${p.desc||p.description||''}</div>
+        <div class="gal-mt">${p.premium||p.is_premium?`<span class="tag-lock">৳${p.price} — ${isBn?'লক করা':'LOCKED'}</span>`:`<span class="tag-free">✅ ${isBn?'বিনামূল্যে':'FREE'}</span>`}</div>
+      </div>
+    </div>`).join('');
+}
+
+function openUnlock(id,price){
+  ulkPostId=id;ulkPrice=price;
+  document.getElementById('ulkPr').textContent='৳'+price;
+  document.getElementById('ulkTx').value='';
+  document.getElementById('ulkPh').value='';
+  openBd('ulkBd');
+}
+
+async function submitUnlock(){
+  const tx=document.getElementById('ulkTx').value.trim();
+  const ph=document.getElementById('ulkPh').value.trim();
+  if(!tx||!ph){toast('TXN আইডি ও ফোন নম্বর দিন।','er');return;}
+  const btn=document.getElementById('ulkBtn');
+  sld(btn,true);
+  await api('/api/gallery-access',{method:'POST',body:JSON.stringify({postId:ulkPostId,txn:tx,phone:ph,price:ulkPrice})});
+  sld(btn,false);
+  closeBd('ulkBd');
+  DB.access.unshift({_id:'a'+Date.now(),phone:ph,postId:ulkPostId,txn:tx,paid:parseInt(ulkPrice),status:'pending',dt:new Date().toISOString()});
+  toast('আনলক রিকোয়েস্ট পাঠানো হয়েছে! অ্যাডমিন ভেরিফাই করবেন।','ok',5000);
+}
+
+/* ════════════════════════════════
+   REVIEWS
+════════════════════════════════ */
+async function renderReviews(){
+  const res=await api('/api/reviews');
+  const rvs=res.ok&&Array.isArray(res.data?.data)?res.data.data:DB.reviews.filter(r=>r.status==='approved');
+  document.getElementById('rvGrid').innerHTML=rvs.length
+    ?rvs.map(r=>`
+      <div class="rv-card">
+        <div class="rv-hdr">
+          <div class="rv-av">${(r.name||'?').charAt(0).toUpperCase()}</div>
+          <div><div class="rv-nm">${r.name}</div><div class="rv-pk">${r.pkg||r.package||''}</div></div>
+        </div>
+        <div class="rv-st">${'★'.repeat(r.stars||r.rating||5)}${'☆'.repeat(5-(r.stars||r.rating||5))}</div>
+        <div class="rv-tx">"${r.txt||r.comment||r.text}"</div>
+        <div class="rv-dt">${r.dt||''}</div>
+      </div>`).join('')
+    :'<div style="color:var(--t3);padding:2rem">কোনো রিভিউ নেই।</div>';
+}
+
+function setRating(n){
+  userRating=n;
+  document.querySelectorAll('#starPick span').forEach((s,i)=>s.classList.toggle('on',i<n));
+}
+
+async function submitReview(){
+  const nm=document.getElementById('rNm').value.trim();
+  const pk=document.getElementById('rPk').value;
+  const tx=document.getElementById('rTx').value.trim();
+  if(!nm||!pk||!tx||!userRating){toast('সব তথ্য পূরণ করুন এবং রেটিং দিন।','er');return;}
+  const btn=document.getElementById('rBtn');
+  sld(btn,true);
+  await api('/api/review',{method:'POST',body:JSON.stringify({name:nm,package:pk,rating:userRating,text:tx})});
+  sld(btn,false);
+  DB.reviews.unshift({_id:'r'+Date.now(),name:nm,pkg:pk,stars:userRating,txt:tx,status:'pending',dt:new Date().toISOString().slice(0,10)});
+  document.getElementById('rvForm').style.display='none';
+  document.getElementById('rvSuc').classList.add('on');
+  toast('রিভিউ জমা হয়েছে! ⭐');
+}
+
+function resetReview(){
+  document.getElementById('rvForm').style.display='';
+  document.getElementById('rvSuc').classList.remove('on');
+  document.getElementById('rNm').value='';
+  document.getElementById('rPk').selectedIndex=0;
+  document.getElementById('rTx').value='';
+  userRating=0;
+  document.querySelectorAll('#starPick span').forEach(s=>s.classList.remove('on'));
+}
+
+async function submitContact(){
+  const nm=document.getElementById('cNm').value.trim();
+  const ph=document.getElementById('cPh').value.trim();
+  const mg=document.getElementById('cMg').value.trim();
+  if(!nm||!ph||!mg){toast('সব তথ্য পূরণ করুন।','er');return;}
+  await api('/api/contact',{method:'POST',body:JSON.stringify({name:nm,phone:ph,message:mg})});
+  document.getElementById('ctForm').style.display='none';
+  document.getElementById('ctSuc').classList.add('on');
+  toast('মেসেজ পাঠানো হয়েছে! 📬');
+}
+
+function resetContact(){
+  document.getElementById('ctForm').style.display='';
+  document.getElementById('ctSuc').classList.remove('on');
+  ['cNm','cPh','cMg'].forEach(id=>document.getElementById(id).value='');
+}
+
+/* ════════════════════════════════
+   ADMIN LOGIN
+════════════════════════════════ */
+function togglePw(){
+  const i=document.getElementById('aPs'),b=document.querySelector('.pwt');
+  if(i.type==='password'){i.type='text';b.textContent='🙈';}
+  else{i.type='password';b.textContent='👁';}
+}
+
+async function doLogin(){
+  const us=document.getElementById('aUs').value.trim();
+  const ps=document.getElementById('aPs').value;
+  const eb=document.getElementById('aErr');
+  eb.classList.remove('on');
+  if(!us||!ps){document.getElementById('aErrTxt').textContent='ইউজারনেম ও পাসওয়ার্ড দিন।';eb.classList.add('on');return;}
+  const btn=document.getElementById('alBtn');
+  btn.classList.add('ld');
+  document.getElementById('alBtnTxt').innerHTML='<div class="spin" style="border-color:rgba(0,0,0,.18);border-top-color:var(--bg)"></div>';
+  const res=await api('/api/admin/login',{method:'POST',body:JSON.stringify({username:us,password:ps})});
+  if(res.ok&&res.data.token){
+    token=res.data.token;admUser=res.data.admin?.username||us;demoMode=false;
+    localStorage.setItem('wcs_at',token);localStorage.setItem('wcs_au',admUser);
+    loginOk();
+  }else{
+    await new Promise(r=>setTimeout(r,600));
+    if(us===ADMIN.u&&ps===ADMIN.p){
+      demoMode=true;admUser=us;
+      localStorage.setItem('wcs_dm','1');localStorage.setItem('wcs_au',admUser);
+      loginOk();
+    }else{
+      btn.classList.remove('ld');
+      document.getElementById('alBtnTxt').textContent='⌨ অ্যাডমিন প্যানেলে প্রবেশ করুন';
+      document.getElementById('aErrTxt').textContent='ভুল তথ্য। আবার চেষ্টা করুন।';
+      eb.classList.add('on');
+      document.getElementById('aPs').value='';
+    }
+  }
+}
+
+function loginOk(){
+  closeBd('admBd');
+  document.getElementById('adm').classList.add('on');
+  document.getElementById('admUsr').textContent=admUser||'admin';
+  document.body.style.overflow='';
+  if(demoMode) toast('Demo mode — backend ছাড়া চলছে।','nf',5000);
+  else toast('স্বাগতম, '+admUser+'! 🎉');
+  loadDash();
+}
+
+function doLogout(){
+  token=null;admUser=null;demoMode=false;
+  ['wcs_at','wcs_dm','wcs_au'].forEach(k=>localStorage.removeItem(k));
+  document.getElementById('adm').classList.remove('on');
+  document.getElementById('aUs').value='';
+  document.getElementById('aPs').value='';
+  document.getElementById('aErr').classList.remove('on');
+  document.getElementById('alBtn').classList.remove('ld');
+  document.getElementById('alBtnTxt').textContent='⌨ অ্যাডমিন প্যানেলে প্রবেশ করুন';
+  toast('লগআউট হয়েছে।','nf');
+}
+
+function admGo(id,btn){
+  document.querySelectorAll('.apnl').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.adm-nav button').forEach(b=>b.classList.remove('on'));
+  document.getElementById('ap-'+id)?.classList.add('on');
+  btn?.classList.add('on');
+  ({dash:loadDash,notices:renderNoticesAdm,services:renderServicesAdm,
+    orders:renderOrders,reviews:renderReviewsAdm,posts:renderPostsAdm,access:renderAccess})[id]?.();
+}
+function mAdmToggle(){document.getElementById('mobAdmMenu').classList.toggle('open');}
+function closeMobAdm(){document.getElementById('mobAdmMenu').classList.remove('open');}
+
+/* ════════════════════════════════
+   ADMIN DASHBOARD
+════════════════════════════════ */
+async function loadDash(){
+  const res=await api('/api/admin/dashboard');
+  if(res.ok&&!demoMode){
+    const d=res.data.data||{};
+    document.getElementById('dTot').textContent=d.orders?.total||0;
+    document.getElementById('dPnd').textContent=d.orders?.pending||0;
+    document.getElementById('dApr').textContent=d.orders?.approved||0;
+    document.getElementById('dRjt').textContent=d.orders?.rejected||0;
+    document.getElementById('dRev').textContent='৳'+(d.revenue||0);
+    document.getElementById('dRvp').textContent=d.reviews?.pending||0;
+    renderDashTbl(d.recent_orders||[]);
+    return;
+  }
+  const o=DB.orders;
+  const rev=o.filter(x=>x.status==='approved').reduce((s,x)=>s+x.amount,0);
+  document.getElementById('dTot').textContent=o.length;
+  document.getElementById('dPnd').textContent=o.filter(x=>x.status==='pending').length;
+  document.getElementById('dApr').textContent=o.filter(x=>x.status==='approved').length;
+  document.getElementById('dRjt').textContent=o.filter(x=>x.status==='rejected').length;
+  document.getElementById('dRev').textContent='৳'+rev;
+  document.getElementById('dRvp').textContent=DB.reviews.filter(x=>x.status==='pending').length;
+  renderDashTbl(o.slice(0,5));
+}
+
+const ST={approved:'✅ অ্যাপ্রুভড',rejected:'❌ বাতিল',pending:'⏳ অপেক্ষমাণ'};
+const SC={approved:'b-a',rejected:'b-r',pending:'b-p'};
+
+function renderDashTbl(list){
+  document.getElementById('dRec').innerHTML=list.length
+    ?list.map(o=>`<tr>
+      <td><strong style="color:var(--t1)">${o.name}</strong></td>
+      <td style="font-size:.7rem">${(o.pkg||o.package||'').split('–')[0]}</td>
+      <td class="mono" style="color:var(--a1)">৳${o.amount}</td>
+      <td><span class="bdg ${SC[o.status]||'b-p'}">${ST[o.status]||o.status}</span></td>
+      <td class="mono" style="font-size:.62rem;color:var(--t3)">${(o.dt||o.createdAt||'').slice(0,10)}</td>
+    </tr>`).join('')
+    :'<tr><td colspan="5"><div class="aempty"><div class="aei">📭</div>কোনো অর্ডার নেই</div></td></tr>';
+}
+
+/* ════════════════════════════════
+   ADMIN NOTICES
+════════════════════════════════ */
+function renderNoticesAdm(){
+  document.getElementById('ntCnt').textContent=DB.notices.length+' টি পোস্ট';
+  document.getElementById('ntAdmBody').innerHTML=DB.notices.length
+    ?DB.notices.map(n=>`<tr>
+      <td style="font-size:.74rem;color:var(--t1)">${n.tl}</td>
+      <td><span class="bdg b-p" style="font-size:.58rem">${NT_LBL[n.tp]||n.tp}</span></td>
+      <td class="mono" style="font-size:.62rem;color:var(--t3)">${new Date(n.dt).toLocaleDateString('en-GB')}</td>
+      <td><button class="btn btn-sm btn-no" onclick="delNotice('${n.id}')">🗑</button></td>
+    </tr>`).join('')
+    :'<tr><td colspan="4"><div class="aempty"><div class="aei">📢</div>কোনো পোস্ট নেই</div></td></tr>';
+  renderNotices();
+}
+
+function addNotice(){
+  const tl=document.getElementById('ntTl').value.trim();
+  const bd=document.getElementById('ntBd').value.trim();
+  const tp=document.getElementById('ntTp').value;
+  const eb=document.getElementById('ntErr');
+  eb.classList.remove('on');
+  if(!tl||!bd){eb.innerHTML='⚠️ শিরোনাম ও বিষয়বস্তু দিন।';eb.classList.add('on');return;}
+  DB.notices.unshift({id:'n'+Date.now(),tl,bd,tp,dt:new Date().toISOString()});
+  document.getElementById('ntTl').value='';
+  document.getElementById('ntBd').value='';
+  eb.classList.remove('on');
+  toast('পোস্ট প্রকাশিত হয়েছে! ✅');
+  renderNoticesAdm();
+}
+
+function delNotice(id){
+  if(!confirm('এই পোস্ট মুছে ফেলবেন?')) return;
+  DB.notices=DB.notices.filter(n=>n.id!==id);
+  toast('মুছে ফেলা হয়েছে।');
+  renderNoticesAdm();
+}
+
+/* ════════════════════════════════
+   ADMIN SERVICES
+════════════════════════════════ */
+function renderServicesAdm(){
+  document.getElementById('svCnt').textContent=DB.services.length+' টি সার্ভিস';
+  document.getElementById('svBody').innerHTML=DB.services.map(s=>{
+    const nm=lang==='bn'?s.bn:s.en;
+    return `<tr>
+      <td style="color:var(--t1)">${s.icon} ${nm}</td>
+      <td><span class="chip">${s.dur} ${lang==='bn'?'মিনিট':'min'}</span></td>
+      <td class="mono" style="color:var(--a1)">৳${s.price}</td>
+      <td>${s.hot?`<span class="bdg b-m">${lang==='bn'?'জনপ্রিয়':'Popular'}</span>`:''}${s.vip?`<span class="bdg b-f">VIP</span>`:''}</td>
+      <td><div style="display:flex;gap:.28rem">
+        <button class="btn btn-sm ${s.on?'btn-g':'btn-ok'}" onclick="togSv('${s.id}',${!s.on})">${s.on?'⛔ বন্ধ':'✅ চালু'}</button>
+        <button class="btn btn-sm btn-no" onclick="delSv('${s.id}')">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function addService(){
+  const nm=document.getElementById('svNm').value.trim();
+  const dr=parseInt(document.getElementById('svDr').value)||0;
+  const pr=parseInt(document.getElementById('svPr').value)||0;
+  const ic=document.getElementById('svIc').value.trim()||'🎯';
+  const ht=document.getElementById('svHt').checked;
+  const vp=document.getElementById('svVp').checked;
+  const eb=document.getElementById('svErr');
+  eb.classList.remove('on');
+  if(!nm||dr<=0||pr<=0){eb.innerHTML='⚠️ নাম, সময় ও মূল্য দিন।';eb.classList.add('on');return;}
+  DB.services.push({id:'sv'+Date.now(),bn:nm,en:nm,dur:dr,price:pr,icon:ic,hot:ht,vip:vp,on:true});
+  ['svNm','svDr','svPr','svIc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('svHt').checked=false;
+  document.getElementById('svVp').checked=false;
+  eb.classList.remove('on');
+  toast('সার্ভিস যোগ হয়েছে! ✅');
+  renderServicesAdm();renderPkgs();renderPrTbl();renderPkgOpts();
+}
+
+function togSv(id,active){
+  const s=DB.services.find(x=>x.id===id);
+  if(s){s.on=active;toast('আপডেট হয়েছে!');renderServicesAdm();renderPkgs();renderPrTbl();renderPkgOpts();}
+}
+
+function delSv(id){
+  if(!confirm('এই সার্ভিস মুছে ফেলবেন?')) return;
+  DB.services=DB.services.filter(x=>x.id!==id);
+  toast('মুছে ফেলা হয়েছে।');
+  renderServicesAdm();renderPkgs();renderPrTbl();renderPkgOpts();
+}
+
+/* ════════════════════════════════
+   ADMIN ORDERS
+════════════════════════════════ */
+function renderOrders(){
+  const fltr=document.getElementById('oFltr')?.value||'';
+  const srch=document.getElementById('oSrch')?.value.toLowerCase()||'';
+  let list=DB.orders;
+  if(fltr) list=list.filter(o=>o.status===fltr);
+  if(srch) list=list.filter(o=>o.name.toLowerCase().includes(srch)||o.txn.toLowerCase().includes(srch));
+  document.getElementById('oBody').innerHTML=list.length
+    ?list.map(o=>`<tr>
+      <td><strong style="color:var(--t1)">${o.name}</strong></td>
+      <td class="mono" style="font-size:.66rem">${o.imo||'—'}</td>
+      <td style="font-size:.7rem">${o.pkg||o.package}</td>
+      <td class="mono" style="font-size:.64rem;color:var(--t2)">${o.txn}</td>
+      <td>${o.method}</td>
+      <td class="mono" style="color:var(--a1)">৳${o.amount}</td>
+      <td><span class="bdg ${SC[o.status]||'b-p'}">${ST[o.status]||o.status}</span></td>
+      <td><div style="display:flex;gap:.26rem;flex-wrap:wrap">
+        ${o.status!=='approved'?`<button class="btn btn-sm btn-ok" onclick="updOrd('${o._id}','approved')">✓ OK</button>`:''}
+        ${o.status!=='rejected'?`<button class="btn btn-sm btn-no" onclick="updOrd('${o._id}','rejected')">✗ না</button>`:''}
+      </div></td>
+    </tr>`).join('')
+    :'<tr><td colspan="8"><div class="aempty"><div class="aei">📭</div>কোনো অর্ডার নেই</div></td></tr>';
+}
+
+async function updOrd(id,status){
+  if(!demoMode){
+    const res=await api('/api/admin/order/'+id+'/status',{method:'PUT',body:JSON.stringify({status})});
+    if(res.ok){toast('আপডেট হয়েছে!');renderOrders();loadDash();return;}
+  }
+  const o=DB.orders.find(x=>x._id===id);
+  if(o){o.status=status;toast('আপডেট হয়েছে!');renderOrders();loadDash();}
+}
+
+/* ════════════════════════════════
+   ADMIN REVIEWS
+════════════════════════════════ */
+function renderReviewsAdm(){
+  const fltr=document.getElementById('rvFltr')?.value||'';
+  const list=fltr?DB.reviews.filter(r=>r.status===fltr):DB.reviews;
+  document.getElementById('rvAdmBody').innerHTML=list.length
+    ?list.map(r=>`<tr>
+      <td><strong style="color:var(--t1)">${r.name}</strong></td>
+      <td style="font-size:.7rem">${r.pkg||r.package||'—'}</td>
+      <td style="color:gold">${'★'.repeat(r.stars||r.rating||5)}</td>
+      <td style="font-size:.7rem;max-width:165px">${(r.txt||r.comment||'').slice(0,60)+((r.txt||r.comment||'').length>60?'…':'')}</td>
+      <td><span class="bdg ${SC[r.status]||'b-p'}">${ST[r.status]||r.status}</span></td>
+      <td><div style="display:flex;gap:.26rem">
+        ${r.status!=='approved'?`<button class="btn btn-sm btn-ok" onclick="updRv('${r._id}','approved')">✓</button>`:''}
+        ${r.status!=='rejected'?`<button class="btn btn-sm btn-g" onclick="updRv('${r._id}','rejected')">✗</button>`:''}
+        <button class="btn btn-sm btn-no" onclick="delRv('${r._id}')">🗑</button>
+      </div></td>
+    </tr>`).join('')
+    :'<tr><td colspan="6"><div class="aempty"><div class="aei">💬</div>কোনো রিভিউ নেই</div></td></tr>';
+}
+
+async function updRv(id,status){
+  if(!demoMode){const res=await api('/api/admin/review/'+id+'/status',{method:'PUT',body:JSON.stringify({status})});if(res.ok){toast('আপডেট!');renderReviewsAdm();loadDash();return;}}
+  const r=DB.reviews.find(x=>x._id===id);if(r){r.status=status;toast('আপডেট!');renderReviewsAdm();loadDash();}
+}
+async function delRv(id){
+  if(!confirm('মুছে ফেলবেন?')) return;
+  if(!demoMode){const res=await api('/api/admin/review/'+id,{method:'DELETE'});if(res.ok){toast('মুছে ফেলা হয়েছে।');renderReviewsAdm();return;}}
+  DB.reviews=DB.reviews.filter(x=>x._id!==id);toast('মুছে ফেলা হয়েছে।');renderReviewsAdm();
+}
+
+/* ════════════════════════════════
+   ADMIN GALLERY POSTS
+════════════════════════════════ */
+function togglePrc(){
+  const p=document.getElementById('pTp').value==='premium';
+  document.getElementById('prcWrap').style.opacity=p?'1':'.35';
+  document.getElementById('prcWrap').style.pointerEvents=p?'':'none';
+}
+togglePrc();
+
+function renderPostsAdm(){
+  document.getElementById('pCnt').textContent=DB.posts.length+' টি পোস্ট';
+  document.getElementById('pAdmBody').innerHTML=DB.posts.length
+    ?DB.posts.map(p=>`<tr>
+      <td><div style="display:flex;align-items:center;gap:.45rem">
+        ${p.thumb||p.thumbnail_url?`<img src="${p.thumb||p.thumbnail_url}" style="width:30px;height:20px;border-radius:4px;object-fit:cover;border:1px solid var(--b1)" onerror="this.style.display='none'">` :''}
+        <strong style="color:var(--t1);font-size:.72rem">${p.title}</strong>
+      </div></td>
+      <td>${p.premium||p.is_premium?`<span class="bdg b-m">🔒 প্রিমিয়াম</span>`:`<span class="bdg b-f">🆓 ফ্রি</span>`}</td>
+      <td class="mono" style="color:var(--a1)">${p.premium||p.is_premium?'৳'+p.price:'–'}</td>
+      <td>${p.active||p.is_active?'✅':'⛔'}</td>
+      <td><div style="display:flex;gap:.26rem">
+        <button class="btn btn-sm ${p.active||p.is_active?'btn-g':'btn-ok'}" onclick="togPost('${p._id}',${!(p.active||p.is_active)})">${p.active||p.is_active?'⛔ লুকান':'✅ দেখান'}</button>
+        <button class="btn btn-sm btn-no" onclick="delPost('${p._id}')">🗑</button>
+      </div></td>
+    </tr>`).join('')
+    :'<tr><td colspan="5"><div class="aempty"><div class="aei">🖼</div>কোনো পোস্ট নেই</div></td></tr>';
+}
+
+async function addPost(){
+  const tl=document.getElementById('pTl').value.trim();
+  if(!tl){document.getElementById('pErr').innerHTML='⚠️ শিরোনাম দিন';document.getElementById('pErr').classList.add('on');return;}
+  const isPrem=document.getElementById('pTp').value==='premium';
+  const price=parseInt(document.getElementById('pPrc').value)||50;
+  const body={title:tl,desc:document.getElementById('pDs').value.trim(),
+    thumb:document.getElementById('pTh').value.trim(),media:document.getElementById('pMd').value.trim(),
+    premium:isPrem,is_premium:isPrem,price:isPrem?price:0,active:true,is_active:true};
+  if(!demoMode){const res=await api('/api/admin/post',{method:'POST',body:JSON.stringify(body)});
+    if(res.ok){DB.posts.unshift({_id:'p'+Date.now(),...body});clearPForm();toast('পোস্ট যোগ হয়েছে! ✅');renderPostsAdm();return;}}
+  DB.posts.unshift({_id:'p'+Date.now(),...body});
+  clearPForm();toast('পোস্ট যোগ হয়েছে! ✅');renderPostsAdm();
+}
+
+function clearPForm(){
+  ['pTl','pDs','pTh','pMd'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('pTp').value='free';togglePrc();
+  document.getElementById('pErr').classList.remove('on');
+}
+
+async function togPost(id,active){
+  if(!demoMode){const res=await api('/api/admin/post/'+id,{method:'PUT',body:JSON.stringify({is_active:active})});
+    if(res.ok){const p=DB.posts.find(x=>x._id===id);if(p){p.active=active;p.is_active=active;}toast('আপডেট!');renderPostsAdm();return;}}
+  const p=DB.posts.find(x=>x._id===id);if(p){p.active=active;p.is_active=active;toast('আপডেট!');renderPostsAdm();}
+}
+
+async function delPost(id){
+  if(!confirm('মুছে ফেলবেন?')) return;
+  if(!demoMode){const res=await api('/api/admin/post/'+id,{method:'DELETE'});
+    if(res.ok){DB.posts=DB.posts.filter(x=>x._id!==id);toast('মুছে ফেলা হয়েছে।');renderPostsAdm();return;}}
+  DB.posts=DB.posts.filter(x=>x._id!==id);toast('মুছে ফেলা হয়েছে।');renderPostsAdm();
+}
+
+/* ════════════════════════════════
+   ADMIN ACCESS
+════════════════════════════════ */
+function renderAccess(){
+  const fltr=document.getElementById('acFltr')?.value||'';
+  const list=fltr?DB.access.filter(a=>a.status===fltr):DB.access;
+  document.getElementById('acBody').innerHTML=list.length
+    ?list.map(a=>`<tr>
+      <td class="mono" style="font-size:.7rem">${a.phone}</td>
+      <td style="font-size:.7rem">${a.postId||'—'}</td>
+      <td class="mono" style="font-size:.64rem;color:var(--t2)">${a.txn}</td>
+      <td class="mono" style="color:var(--a1)">৳${a.paid}</td>
+      <td><span class="bdg ${SC[a.status]||'b-p'}">${ST[a.status]||a.status}</span></td>
+      <td><div style="display:flex;gap:.26rem">
+        ${a.status!=='approved'?`<button class="btn btn-sm btn-ok" onclick="updAc('${a._id}','approved')">✓ দিন</button>`:''}
+        ${a.status!=='rejected'?`<button class="btn btn-sm btn-no" onclick="updAc('${a._id}','rejected')">✗ না</button>`:''}
+      </div></td>
+    </tr>`).join('')
+    :'<tr><td colspan="6"><div class="aempty"><div class="aei">🔓</div>কোনো রিকোয়েস্ট নেই</div></td></tr>';
+}
+
+async function updAc(id,status){
+  if(!demoMode){const res=await api('/api/admin/access-request/'+id+'/status',{method:'PUT',body:JSON.stringify({status})});if(res.ok){toast('আপডেট!');renderAccess();return;}}
+  const a=DB.access.find(x=>x._id===id);if(a){a.status=status;toast('আপডেট!');renderAccess();}
+}
+
+/* ════════════════════════════════
+   CHATBOT
+════════════════════════════════ */
+const CHAT_SYS=`You are the AI assistant for "Webcam Service".
+Reply in Bangla if user writes Bangla, English if English.
+Service: Trial 2min ৳50, Standard 10min ৳200, Extended 20min ৳400, Premium 30min ৳500.
+Payment: bKash or Nagad → Send Money → 01898694648.
+Order: Pay → copy TXN → fill form → confirmed 5-10min.
+WhatsApp: +880`+WA+`.
+Short 2-4 line replies, use emojis. Never share admin info.`;
+
+function toggleChat(){
+  chatOpen=!chatOpen;
+  const box=document.getElementById('chatBox');
+  if(chatOpen){
+    box.classList.add('open');
+    document.querySelector('.chat-pulse').style.display='none';
+    if(!chatStarted){chatStarted=true;addBot('আসসালামু আলাইকুম! 👋 আমি **WCS AI**। প্যাকেজ, দাম, অর্ডার — যেকোনো প্রশ্ন করুন! 😊');}
+    setTimeout(()=>document.getElementById('chatIn')?.focus(),280);
+  }else{box.classList.remove('open');}
+}
+
+function addBot(text){
+  const msgs=document.getElementById('chatMsgs');
+  const now=new Date().toLocaleTimeString('en-BD',{hour:'2-digit',minute:'2-digit'});
+  const d=document.createElement('div');d.className='cmsg bot';
+  d.innerHTML=`<div class="cmav">🤖</div><div><div class="cmbb">${text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div><div class="cmtm">${now}</div></div>`;
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+}
+
+function addUsr(text){
+  const msgs=document.getElementById('chatMsgs');
+  const now=new Date().toLocaleTimeString('en-BD',{hour:'2-digit',minute:'2-digit'});
+  const d=document.createElement('div');d.className='cmsg usr';
+  d.innerHTML=`<div><div class="cmbb">${text}</div><div class="cmtm" style="text-align:right">${now}</div></div><div class="cmav">👤</div>`;
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+}
+
+function showTyp(){
+  const msgs=document.getElementById('chatMsgs');
+  const d=document.createElement('div');d.className='cmsg bot';d.id='typDiv';
+  d.innerHTML='<div class="cmav">🤖</div><div class="typing"><span></span><span></span><span></span></div>';
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+}
+function hideTyp(){document.getElementById('typDiv')?.remove();}
+
+function quickMsg(text){document.getElementById('chatIn').value=text;sendChat();}
+
+async function sendChat(){
+  const inp=document.getElementById('chatIn');
+  const text=inp.value.trim();if(!text) return;
+  inp.value='';addUsr(text);chatHist.push({role:'user',content:text});
+  document.getElementById('qbtns').style.display='none';showTyp();
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:CHAT_SYS,messages:chatHist.slice(-10)}),
+    });
+    const data=await res.json();hideTyp();
+    if(data.content?.[0]?.text){const r=data.content[0].text;chatHist.push({role:'assistant',content:r});addBot(r);}
+    else throw new Error();
+  }catch{
+    hideTyp();
+    const t=text.toLowerCase();
+    let r;
+    if(t.match(/দাম|price|কত|package|প্যাকেজ/)) r='💰 ট্রায়াল ২মি **৳৫০**, স্ট্যান্ডার্ড ১০মি **৳২০০**, এক্সটেন্ডেড ২০মি **৳৪০০**, প্রিমিয়াম ৩০মি **৳৫০০**';
+    else if(t.match(/order|অর্ডার|কীভাবে/)) r='📦 প্যাকেজ বেছে নিন → **01898694648**-এ টাকা পাঠান → TXN ID দিয়ে ফর্ম পূরণ করুন → ৫-১০মি কনফার্ম ✅';
+    else if(t.match(/payment|পেমেন্ট|bkash|nagad|নম্বর/)) r='💳 **bKash** বা **Nagad** — Send Money\n📞 নম্বর: **01898694648**';
+    else if(t.match(/confirm|কনফার্ম|কতক্ষণ|সময়/)) r='⏰ পেমেন্ট ভেরিফাই হওয়ার পর **৫-১০ মিনিটে** WhatsApp/IMO-তে যোগাযোগ করা হবে! 😊';
+    else if(t.match(/whatsapp|contact|যোগাযোগ/)) r='📱 WhatsApp: **+880'+WA+'**\n২৪/৭ অনলাইন! 💬';
+    else r='😊 প্রশ্নটা বুঝতে পারিনি। নিচের বাটন থেকে সাহায্য নিন!';
+    chatHist.push({role:'assistant',content:r});addBot(r);
+  }
+}
+
+/* ════════════════════════════════
+   INIT
+════════════════════════════════ */
+document.addEventListener('DOMContentLoaded',()=>{
+  // Apply saved settings
+  document.documentElement.setAttribute('data-theme',theme);
+  ['tdk','mtdk'].forEach(id=>document.getElementById(id)?.classList.toggle('on',theme==='dark'));
+  ['tlt','mtlt'].forEach(id=>document.getElementById(id)?.classList.toggle('on',theme==='light'));
+  ['lbn','mlbn'].forEach(id=>document.getElementById(id)?.classList.toggle('on',lang==='bn'));
+  ['len','mlen'].forEach(id=>document.getElementById(id)?.classList.toggle('on',lang==='en'));
+
+  // Render all content
+  renderPkgs();
+  renderPrTbl();
+  renderPkgOpts();
+  renderNotices();
+  renderReviews();
+  renderGallery();
+
+  // Restore admin session
+  const at=localStorage.getItem('wcs_at');
+  const dm=localStorage.getItem('wcs_dm');
+  const au=localStorage.getItem('wcs_au');
+  if(at){
+    token=at;admUser=au;
+    api('/api/admin/me').then(r=>{
+      if(r.ok){demoMode=false;loginOk();}
+      else{['wcs_at','wcs_dm','wcs_au'].forEach(k=>localStorage.removeItem(k));}
+    });
+  }else if(dm){
+    demoMode=true;admUser=au||'admin';loginOk();
+  }
+
+  // URL routing
+  const hash=window.location.hash.replace('#','');
+  if(['home','prices','order','gallery','reviews','contact'].includes(hash)) go(hash);
+  if(new URLSearchParams(window.location.search).get('admin')==='1'){
+    openBd('admBd');setTimeout(()=>document.getElementById('aUs')?.focus(),300);
+  }
+
+  // Keyboard handlers
+  document.getElementById('aUs').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('aPs').focus();});
+  document.getElementById('aPs').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+  // Close menus on outside click
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('#mobAdmMenu')&&!e.target.closest('.mob-adm-btn')) closeMobAdm();
+    if(!e.target.closest('#mobMenu')&&!e.target.closest('.hbg')) document.getElementById('mobMenu').classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>
